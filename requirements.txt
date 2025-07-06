@@ -1,0 +1,15 @@
+ipython
+textblob
+wikipedia
+pytest
+pytest-cov
+black
+pylint
+fire==0.5.0
+fastapi
+uvicorn[standard]
+jinja2
+pandas 
+snowflake-connector-python
+plotly
+cryptography
