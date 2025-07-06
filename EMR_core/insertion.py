@@ -22,46 +22,19 @@ def auth_snflk():
     )
     return conn
 
-def add_patient(conn):
-    conn = auth_snflk()
+def add_patient(conn, patient_data):
     cursor = conn.cursor()
     try:
-        # Prompt for all required fields
-        id = input("ID: ")
-        name = input("Name: ")
-        age = input("Age: ")
-        gender = input("Gender: ")
-        occupation = input("Occupation: ")
-        marital_status = input("Marital Status: ")
-        address = input("Address: ")
-        email = input("Email: ")
-        phone = input("Phone: ")
-        national_id = input("National ID: ")
-        insurance = input("Insurance: ")
-        insurance_card_id = input("Insurance Card ID: ")
-        diagnosis = input("Diagnosis: ")
-        chief_complaint = input("Chief Complaint: ")
-        medications = input("Medications: ")
-        investigations = input("Investigations: ")
-
-        # Call the stored procedure with positional parameters
         sql = """
-        CALL Add_New_Patient(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        CALL Add_New_Patient(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
-        # Parameters must be in the exact order the stored proc expects
-        params = (
-            id, name, age, gender, occupation, marital_status, address, email, phone,
-            national_id, insurance, insurance_card_id, diagnosis, chief_complaint,
-            medications, investigations
-        )
-
-        cursor.execute(sql, params)
-        print("✅ Patient added successfully!")
-
+        cursor.execute(sql, patient_data)
+        result = cursor.fetchone()
+        print("✅ Stored proc result:", result)
+        return result
     except Exception as e:
         print(f"❌ Error adding patient: {e}")
-
+        raise
     finally:
         cursor.close()
-        conn.close()
 
