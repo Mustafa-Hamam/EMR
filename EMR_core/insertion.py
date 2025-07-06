@@ -26,7 +26,7 @@ def add_patient(conn, patient_data):
     cursor = conn.cursor()
     try:
         sql = """
-        CALL Add_New_Patient(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        CALL ADD_NEW_PATIENT(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         cursor.execute(sql, patient_data)
         result = cursor.fetchone()

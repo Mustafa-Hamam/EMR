@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi import Request, Form
+from fastapi import Request, Form,HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 import uvicorn
@@ -18,12 +18,12 @@ async def new_patient_form(request: Request):
     # Serve the form template
     return templates.TemplateResponse("newpatient.html", {"request": request})
 
-@app.post("/newpatient")
-async def submit_new_patient(
+@app.post("/newpatient", response_class=HTMLResponse)
+async def submit_patient(
     request: Request,
-    id: str = Form(...),
+    patient_id: str = Form(...),
     name: str = Form(...),
-    age: int = Form(...),
+    age: str = Form(...),
     gender: str = Form(...),
     occupation: str = Form(...),
     marital_status: str = Form(...),
@@ -33,32 +33,27 @@ async def submit_new_patient(
     national_id: str = Form(...),
     insurance: str = Form(...),
     insurance_card_id: str = Form(...),
-    diagnosis: str = Form(""),
-    chief_complaint: str = Form(""),
-    medications: str = Form(""),
-    investigations: str = Form("")
+    diagnosis: str = Form(...),
+    chief_complaint: str = Form(...),
+    medications: str = Form(...),
+    investigations: str = Form(...)
 ):
     conn = auth_snflk()
-    cursor = conn.cursor()
+    patient_data = (
+        patient_id, name, age, gender, occupation, marital_status, address, email, phone,
+        national_id, insurance, insurance_card_id, diagnosis, chief_complaint,
+        medications, investigations
+    )
     try:
-        sql = """
-        CALL add_new_patient(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        params = (
-            id, name, age, gender, occupation, marital_status, address, email, phone,
-            national_id, insurance, insurance_card_id, diagnosis, chief_complaint,
-            medications, investigations
-        )
-        cursor.execute(sql, params)
-        message = f"✅ Added New Patient {name} with ID: {id}"
+        result = add_patient(conn, patient_data)
     except Exception as e:
-        message = f"❌ Error adding patient: {e}"
+        raise HTTPException(status_code=500, detail="Failed to add patient")
     finally:
-        cursor.close()
         conn.close()
 
-    # Show result page
-    return templates.TemplateResponse("newpatient.html", {"request": request, "message": message})
+    return templates.TemplateResponse(
+        "confirmation.html", {"request": request, "message": f"✅ Added new patient {name} with ID {patient_id}"}
+    )
 
 # @app.get("/newpatients",  response_class=HTMLResponse)
 # async def patients_report(request: Request):
