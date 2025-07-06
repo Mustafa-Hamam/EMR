@@ -84,7 +84,7 @@ async def submit_doctor(
 ):
     conn = auth_snflk()
     try:
-        result = add_patient(
+        result = add_Doctor(
             conn, doctor_id, name, age, gender, email, address, address,
             Phone, national_id, degree, specialty, certifications,
             salary, leaves, schedule
