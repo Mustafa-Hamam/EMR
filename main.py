@@ -6,7 +6,7 @@ import uvicorn
 from EMR_core.insertion import auth_snflk, add_patient
 
 app = FastAPI()
-templates = Jinja2Templates(directory="report_core/templates")
+templates = Jinja2Templates(directory="EMR_core/templates")
 
 
 @app.get("/",response_class=HTMLResponse)

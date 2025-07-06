@@ -13,3 +13,4 @@ pandas
 snowflake-connector-python
 plotly
 cryptography
+python-multipart
