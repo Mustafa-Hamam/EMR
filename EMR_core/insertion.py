@@ -28,7 +28,7 @@ def add_patient(conn, patient_id, name, age, gender, occupation, marital_status,
     cursor = conn.cursor()
     try:
         sql = f"""
-        CALL ADD_NEW_PATIENT(
+        CALL CLINIC_A.PUBLIC.ADD_NEW_PATIENT(
             '{patient_id}', '{name}', {age}, '{gender}', '{occupation}', '{marital_status}', '{address}',
             '{email}', '{phone}', '{national_id}', '{insurance}', '{insurance_card_id}',
             '{diagnosis}', '{chief_complaint}', '{medications}', '{investigations}'
