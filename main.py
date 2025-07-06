@@ -4,7 +4,7 @@ from fastapi import Request, Form,HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 import uvicorn
-from EMR_core.insertion import auth_snflk, add_patient, add_Doctor
+from EMR_core.insertion import auth_snflk, add_patient, add_Doctor, add_Receptionist
 
 app = FastAPI()
 templates = Jinja2Templates(directory="EMR_core/templates")
@@ -23,6 +23,11 @@ async def new_patient_form(request: Request):
 async def new_doctor_form(request: Request):
     # Serve the form template
     return templates.TemplateResponse("newdoctor.html", {"request": request})
+
+@app.get("/newreceptionist", response_class=HTMLResponse)
+async def new_receptionist_form(request: Request):
+    # Serve the form template
+    return templates.TemplateResponse("newreceptionist.html", {"request": request})
 
 @app.post("/newpatient", response_class=HTMLResponse)
 async def submit_patient(
@@ -64,13 +69,11 @@ async def submit_patient(
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
     finally:
         conn.close()
-
     # Only show success if no error occurred
     return templates.TemplateResponse(
         "confirmation.html",
         {"request": request, "message": f"✅ Added new patient {name} with ID {patient_id}"}
     )
-
 
 @app.post("/newdoctor", response_class=HTMLResponse)
 async def submit_doctor(
@@ -98,11 +101,9 @@ async def submit_doctor(
             Phone, national_id, degree, specialty, certifications,
             salary, leaves, schedule_str
         )
-
         # Check for error indication
         if result.lower().startswith("error"):
             raise HTTPException(status_code=500, detail=result)
-
     except HTTPException as e:
         # Let FastAPI handle raised HTTPExceptions properly
         raise e
@@ -110,11 +111,47 @@ async def submit_doctor(
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
     finally:
         conn.close()
-
     # Only show success if no error occurred
     return templates.TemplateResponse(
         "confirmation.html",
         {"request": request, "message": f"✅ Added new doctor {name} with ID {doctor_id}"}
+    )
+
+@app.post("/newreceptionist", response_class=HTMLResponse)
+async def submit_receptionist(
+    request: Request,
+    receptionist_id: str = Form(...),
+    name: str = Form(...),
+    age: str = Form(...),
+    gender: str = Form(...),
+    Phone: str = Form(...),
+    email: str = Form(...),
+    address: str = Form(...),   
+    national_id: str = Form(...),
+    education: str = Form(...),
+    leaves: str = Form(...),
+    salary: str = Form(...)
+):
+    conn = auth_snflk()
+    try:
+        result = add_Receptionist(
+            conn, receptionist_id, name, age, gender, Phone, email, address, 
+                national_id, education, leaves, salary
+        )
+        # Check for error indication
+        if result.lower().startswith("error"):
+            raise HTTPException(status_code=500, detail=result)
+    except HTTPException as e:
+        # Let FastAPI handle raised HTTPExceptions properly
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    finally:
+        conn.close()
+    # Only show success if no error occurred
+    return templates.TemplateResponse(
+        "confirmation.html",
+        {"request": request, "message": f"✅ Added new receptionist {name} with ID {receptionist_id}"}
     )
 
 # @app.get("/newpatients",  response_class=HTMLResponse)
