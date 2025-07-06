@@ -24,17 +24,25 @@ def auth_snflk():
 
 def add_patient(conn, patient_id, name, age, gender, occupation, marital_status, address,
                 email, phone, national_id, insurance, insurance_card_id,
-                diagnosis, chief_complaint, medications, investigations):
+                diagnosis, chief_complaint, medications, investigations,first_visit):
     cursor = conn.cursor()
     try:
-        sql = f"""
-        CALL CLINIC_A.PUBLIC.ADD_NEW_PATIENT(
-            '{patient_id}', '{name}', {age}, '{gender}', '{occupation}', '{marital_status}', '{address}',
-            '{email}', '{phone}', '{national_id}', '{insurance}', '{insurance_card_id}',
-            '{diagnosis}', '{chief_complaint}', '{medications}', '{investigations}'
+        sql = """
+        INSERT INTO CLINIC_A.PUBLIC.PATIENT (
+            ID, NAME, AGE, GENDER, OCCUPATION, MARITAL_STATUS, ADDRESS,
+            EMAIL, PHONE, NATIONAL_ID, INSURANCE, INSURANCE_CARD_ID,
+            DIAGNOSIS, CHIEF_COMPLAINT, MEDICATIONS, INVESTIGATIONS,FIRST_VISIT
         )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
         """
-        cursor.execute(sql)
+        cursor.execute(
+            sql,
+            (
+                patient_id, name, age, gender, occupation, marital_status, address,
+                email, phone, national_id, insurance, insurance_card_id,
+                diagnosis, chief_complaint, medications, investigations, first_visit
+            )
+        )
         print("✅ Patient added successfully!")
         return "Patient added successfully!"
     except Exception as e:

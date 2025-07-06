@@ -41,7 +41,9 @@ async def submit_patient(
     diagnosis: str = Form(...),
     chief_complaint: str = Form(...),
     medications: str = Form(...),
-    investigations: str = Form(...)
+    investigations: str = Form(...),
+    first_visit: str = Form(...)
+
 ):
     conn = auth_snflk()
     try:
