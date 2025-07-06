@@ -22,7 +22,9 @@ def auth_snflk():
     )
     return conn
 
-def add_patient(conn, patient_data):
+def add_patient(conn, patient_id, name, age, gender, occupation, marital_status, address,
+                email, phone, national_id, insurance, insurance_card_id,
+                diagnosis, chief_complaint, medications, investigations):
     cursor = conn.cursor()
     try:
         sql = f"""
@@ -33,12 +35,11 @@ def add_patient(conn, patient_data):
         )
         """
         cursor.execute(sql)
-        result = cursor.fetchone()
-        print("✅ Stored proc result:", result)
-        return result
+        print("✅ Patient added successfully!")
+        return "Patient added successfully!"
     except Exception as e:
         print(f"❌ Error adding patient: {e}")
-        raise
+        return f"Error adding patient: {e}"
     finally:
         cursor.close()
-
+        conn.close()

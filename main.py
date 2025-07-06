@@ -39,13 +39,12 @@ async def submit_patient(
     investigations: str = Form(...)
 ):
     conn = auth_snflk()
-    patient_data = (
-        patient_id, name, age, gender, occupation, marital_status, address, email, phone,
-        national_id, insurance, insurance_card_id, diagnosis, chief_complaint,
-        medications, investigations
-    )
     try:
-        result = add_patient(conn, patient_data)
+        result = add_patient(
+        conn, patient_id, name, age, gender, occupation, marital_status, address,
+        email, phone, national_id, insurance, insurance_card_id,
+        diagnosis, chief_complaint, medications, investigations
+    )
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to add patient")
     finally:
