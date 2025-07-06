@@ -50,7 +50,7 @@ def add_Doctor(conn, doctor_id, name, age, gender, email, address, Phone,
     cursor = conn.cursor()
     try:
         sql = f"""
-        CALL CLINIC_A.PUBLIC.ADD_NEW_PATIENT(
+        CALL CLINIC_A.PUBLIC.ADD_NEW_DOCTOR(
             '{doctor_id}', '{name}', {age}, '{gender}', '{email}', '{address}', '{Phone}',
             '{national_id}', '{degree}', '{specialty}', '{certifications}', '{salary}',
             '{leaves}', '{schedule}'
