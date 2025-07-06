@@ -51,9 +51,9 @@ def add_Doctor(conn, doctor_id, name, age, gender, email, address, Phone,
     try:
         sql = """
         INSERT INTO CLINIC_A.PUBLIC.DOCTOR (
-            doctor_id, name, age, gender, email, address, Phone,
-            national_id, degree, specialty, certifications, salary,
-            leaves, schedule
+            ID, Name, Age, Gender, Email, Address, Phone,
+            National_id, Degree, Specialty, Certifications, Salary,
+            Leaves, Schedule
         )
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
