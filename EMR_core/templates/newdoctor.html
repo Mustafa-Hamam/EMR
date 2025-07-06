@@ -86,8 +86,37 @@
             <label for="leaves">Leaves</label>
             <input type="text" class="form-control" id="leaves" name="leaves">
 
-            <label for="schedule">Schedule</label>
-            <input type="text" class="form-control" id="schedule" name="schedule">
+            <label>Schedule (Select Days)</label>
+            <div class="d-flex flex-wrap gap-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="schedule" value="Monday" id="monday">
+                    <label class="form-check-label" for="monday">Monday</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="schedule" value="Tuesday" id="tuesday">
+                    <label class="form-check-label" for="tuesday">Tuesday</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="schedule" value="Wednesday" id="wednesday">
+                    <label class="form-check-label" for="wednesday">Wednesday</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="schedule" value="Thursday" id="thursday">
+                    <label class="form-check-label" for="thursday">Thursday</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="schedule" value="Friday" id="friday">
+                    <label class="form-check-label" for="friday">Friday</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="schedule" value="Saturday" id="saturday">
+                    <label class="form-check-label" for="saturday">Saturday</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="schedule" value="Sunday" id="sunday">
+                    <label class="form-check-label" for="sunday">Sunday</label>
+                </div>
+            </div>
 
             <button type="submit" class="btn btn-submit">Submit Doctor Data</button>
         </form>

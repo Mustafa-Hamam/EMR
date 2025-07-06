@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import FastAPI
 from fastapi import Request, Form,HTTPException
 from fastapi.templating import Jinja2Templates
@@ -87,14 +88,15 @@ async def submit_doctor(
     certifications: str = Form(...),
     salary: str = Form(...),
     leaves: str = Form(...),
-    schedule: str = Form(...)
+    schedule: List[str] = Form(...)
 ):
     conn = auth_snflk()
     try:
+        schedule_str = ", ".join(schedule)
         result = add_Doctor(
             conn, doctor_id, name, age, gender, email, address, 
             Phone, national_id, degree, specialty, certifications,
-            salary, leaves, schedule
+            salary, leaves, schedule_str
         )
 
         # Check for error indication
