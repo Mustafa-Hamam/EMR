@@ -18,6 +18,11 @@ async def new_patient_form(request: Request):
     # Serve the form template
     return templates.TemplateResponse("newpatient.html", {"request": request})
 
+@app.get("/newdoctor", response_class=HTMLResponse)
+async def new_doctor_form(request: Request):
+    # Serve the form template
+    return templates.TemplateResponse("newdoctor.html", {"request": request})
+
 @app.post("/newpatient", response_class=HTMLResponse)
 async def submit_patient(
     request: Request,
@@ -63,6 +68,7 @@ async def submit_patient(
         "confirmation.html",
         {"request": request, "message": f"✅ Added new patient {name} with ID {patient_id}"}
     )
+
 
 @app.post("/newdoctor", response_class=HTMLResponse)
 async def submit_doctor(
@@ -144,5 +150,5 @@ async def submit_doctor(
 #         "title": "Monthly Performance Report",
 #         "heading": "Monthly Performance Report",
 #         "table": html_table})
-if __name__ == "__main__":
-    uvicorn.run(app, port=10000, host="0.0.0.0")
+# if __name__ == "__main__":
+#     uvicorn.run(app, port=10000, host="0.0.0.0")
