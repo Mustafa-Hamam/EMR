@@ -25,10 +25,14 @@ def auth_snflk():
 def add_patient(conn, patient_data):
     cursor = conn.cursor()
     try:
-        sql = """
-        CALL ADD_NEW_PATIENT(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        sql = f"""
+        CALL ADD_NEW_PATIENT(
+            '{patient_id}', '{name}', {age}, '{gender}', '{occupation}', '{marital_status}', '{address}',
+            '{email}', '{phone}', '{national_id}', '{insurance}', '{insurance_card_id}',
+            '{diagnosis}', '{chief_complaint}', '{medications}', '{investigations}'
+        )
         """
-        cursor.execute(sql, patient_data)
+        cursor.execute(sql)
         result = cursor.fetchone()
         print("✅ Stored proc result:", result)
         return result
