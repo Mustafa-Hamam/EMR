@@ -50,16 +50,21 @@ def add_Doctor(conn, doctor_id, name, age, gender, email, address, Phone,
     cursor = conn.cursor()
     try:
         sql = """
-        CALL CLINIC_A.PUBLIC.ADD_NEW_DOCTOR(
-            ?, ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, ?, ?, ?
-        )
-        """
-        cursor.execute(sql, [
+        INSERT INTO CLINIC_A.PUBLIC.DOCTOR (
             doctor_id, name, age, gender, email, address, Phone,
             national_id, degree, specialty, certifications, salary,
             leaves, schedule
-        ])
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(
+            sql,
+            (
+                doctor_id, name, age, gender, email, address, Phone,
+                national_id, degree, specialty, certifications, salary,
+                leaves, schedule
+            )
+        )
         print("✅ Doctor added successfully!")
         return "Doctor added successfully!"
     except Exception as e:
