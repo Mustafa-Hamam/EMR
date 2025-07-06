@@ -41,17 +41,27 @@ async def submit_patient(
     conn = auth_snflk()
     try:
         result = add_patient(
-        conn, patient_id, name, age, gender, occupation, marital_status, address,
-        email, phone, national_id, insurance, insurance_card_id,
-        diagnosis, chief_complaint, medications, investigations
-    )
+            conn, patient_id, name, age, gender, occupation, marital_status, address,
+            email, phone, national_id, insurance, insurance_card_id,
+            diagnosis, chief_complaint, medications, investigations
+        )
+
+        # Check for error indication
+        if result.lower().startswith("error"):
+            raise HTTPException(status_code=500, detail=result)
+
+    except HTTPException as e:
+        # Let FastAPI handle raised HTTPExceptions properly
+        raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to add patient")
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
     finally:
         conn.close()
 
+    # Only show success if no error occurred
     return templates.TemplateResponse(
-        "confirmation.html", {"request": request, "message": f"✅ Added new patient {name} with ID {patient_id}"}
+        "confirmation.html",
+        {"request": request, "message": f"✅ Added new patient {name} with ID {patient_id}"}
     )
 
 # @app.get("/newpatients",  response_class=HTMLResponse)
