@@ -43,3 +43,26 @@ def add_patient(conn, patient_id, name, age, gender, occupation, marital_status,
     finally:
         cursor.close()
         conn.close()
+
+def add_Doctor(conn, doctor_id, name, age, gender, email, address, Phone,
+                national_id, degree, specialty, certifications, salary,
+                leaves, schedule):
+    cursor = conn.cursor()
+    try:
+        sql = f"""
+        CALL CLINIC_A.PUBLIC.ADD_NEW_PATIENT(
+            '{doctor_id}', '{name}', {age}, '{gender}', '{email}', '{address}', '{Phone}',
+            '{national_id}', '{degree}', '{specialty}', '{certifications}', '{salary}',
+            '{leaves}', '{schedule}'
+        )
+        """
+        cursor.execute(sql)
+        print("✅ Doctor added successfully!")
+        return "Doctor added successfully!"
+    except Exception as e:
+        print(f"❌ Error adding Doctor: {e}")
+        return f"Error adding Doctor: {e}"
+    finally:
+        cursor.close()
+        conn.close()
+

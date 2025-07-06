@@ -3,7 +3,7 @@ from fastapi import Request, Form,HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 import uvicorn
-from EMR_core.insertion import auth_snflk, add_patient
+from EMR_core.insertion import auth_snflk, add_patient, add_Doctor
 
 app = FastAPI()
 templates = Jinja2Templates(directory="EMR_core/templates")
@@ -62,6 +62,50 @@ async def submit_patient(
     return templates.TemplateResponse(
         "confirmation.html",
         {"request": request, "message": f"✅ Added new patient {name} with ID {patient_id}"}
+    )
+
+@app.post("/newdoctor", response_class=HTMLResponse)
+async def submit_doctor(
+    request: Request,
+    doctor_id: str = Form(...),
+    name: str = Form(...),
+    age: str = Form(...),
+    gender: str = Form(...),
+    email: str = Form(...),
+    address: str = Form(...),
+    Phone: str = Form(...),
+    national_id: str = Form(...),
+    degree: str = Form(...),
+    specialty: str = Form(...),
+    certifications: str = Form(...),
+    salary: str = Form(...),
+    leaves: str = Form(...),
+    schedule: str = Form(...)
+):
+    conn = auth_snflk()
+    try:
+        result = add_patient(
+            conn, doctor_id, name, age, gender, email, address, address,
+            Phone, national_id, degree, specialty, certifications,
+            salary, leaves, schedule
+        )
+
+        # Check for error indication
+        if result.lower().startswith("error"):
+            raise HTTPException(status_code=500, detail=result)
+
+    except HTTPException as e:
+        # Let FastAPI handle raised HTTPExceptions properly
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    finally:
+        conn.close()
+
+    # Only show success if no error occurred
+    return templates.TemplateResponse(
+        "confirmation.html",
+        {"request": request, "message": f"✅ Added new doctor {name} with ID {doctor_id}"}
     )
 
 # @app.get("/newpatients",  response_class=HTMLResponse)
