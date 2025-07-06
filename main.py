@@ -43,14 +43,13 @@ async def submit_patient(
     medications: str = Form(...),
     investigations: str = Form(...),
     first_visit: str = Form(...)
-
 ):
     conn = auth_snflk()
     try:
         result = add_patient(
             conn, patient_id, name, age, gender, occupation, marital_status, address,
             email, phone, national_id, insurance, insurance_card_id,
-            diagnosis, chief_complaint, medications, investigations
+            diagnosis, chief_complaint, medications, investigations,first_visit
         )
 
         # Check for error indication
