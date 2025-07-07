@@ -244,6 +244,7 @@ async def submit_booking(
     request: Request,
     patient_phone: int = Form(...),
     patient_name: str = Form(...),
+    national_id: int = Form(...),
     doctor_id: int = Form(...),
     doctor_name: str = Form(...),
     receptionist_id: int = Form(...),
@@ -255,7 +256,7 @@ async def submit_booking(
     conn = auth_snflk()
     try:
         booking_id = add_booking(
-            conn, patient_phone, patient_name, doctor_id, doctor_name,
+            conn, patient_phone, patient_name, national_id, doctor_id, doctor_name,
             receptionist_id, type, date, time, status
         )
 
