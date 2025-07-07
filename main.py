@@ -250,13 +250,13 @@ async def submit_booking(
     type: str = Form(...),
     date: str = Form(...),
     time: str = Form(...),
-    Status: str = Form(...)
+    status: str = Form(...)
 ):
     conn = auth_snflk()
     try:
         booking_id = add_booking(
             conn, patient_phone, patient_name, doctor_id, doctor_name,
-            receptionist_id, type, date, time, Status
+            receptionist_id, type, date, time, status
         )
 
         if isinstance(booking_id, str) and booking_id.lower().startswith("error"):
