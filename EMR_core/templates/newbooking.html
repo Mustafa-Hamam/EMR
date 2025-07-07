@@ -70,7 +70,7 @@
         <label for="time">Time</label>
         <input type="time" class="form-control" id="time" name="time" required>
 
-        <label for="status">Booking Status</label>
+        <label for="Status">Booking Status</label>
         <select class="form-control" id="status" name="status" required onchange="handleCustomStatus(this)">
             <option value="">-- Select Status --</option>
             <option value="Scheduled">Scheduled</option>
@@ -78,9 +78,9 @@
             <option value="Missed">Missed</option>
             <option value="Re-Scheduled">Re-Scheduled</option>
             <option value="Cancelled">Cancelled</option>
-            <option value="custom">Other (Enter manually)</option>
+            <!-- <option value="custom">Other (Enter manually)</option> -->
         </select>
-        <input type="text" class="form-control mt-2 d-none" id="customStatus" name="status_custom" placeholder="Enter custom status">
+        <!-- <input type="text" class="form-control mt-2 d-none" id="customStatus" name="status_custom" placeholder="Enter custom status"> -->
 
         <button type="submit" class="btn btn-submit">Submit Booking</button>
     </form>
@@ -100,20 +100,20 @@
     }
 
     // ✅ Overwrite the 'status' value with custom input if applicable
-    document.querySelector("form").addEventListener("submit", function (e) {
-        const statusSelect = document.getElementById("status");
-        const customStatus = document.getElementById("customStatus");
+    // document.querySelector("form").addEventListener("submit", function (e) {
+    //     const statusSelect = document.getElementById("status");
+    //     const customStatus = document.getElementById("customStatus");
 
-        if (statusSelect.value === "custom" && customStatus.value.trim() !== "") {
-            const hidden = document.createElement("input");
-            hidden.type = "hidden";
-            hidden.name = "status";
-            hidden.value = customStatus.value.trim();
-            this.appendChild(hidden);
+    //     if (statusSelect.value === "custom" && customStatus.value.trim() !== "") {
+    //         const hidden = document.createElement("input");
+    //         hidden.type = "hidden";
+    //         hidden.name = "status";
+    //         hidden.value = customStatus.value.trim();
+    //         this.appendChild(hidden);
 
-            statusSelect.disabled = true;
-        }
-    });
+    //         statusSelect.disabled = true;
+    //     }
+    // });
     async function fetchPatientDetails() {
         const phone = document.getElementById("patient_phone").value;
         if (!phone) return;
