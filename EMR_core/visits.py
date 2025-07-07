@@ -22,9 +22,7 @@ def add_visit(conn, Doctor_ID, Doctor_Name, Patient_ID, Patient_name, Type, Date
                 Status, Payment
             )
         )
-
-        # Instead of LASTVAL(), fetch the max ID after insertion:
-        cursor.execute("SELECT MAX(ID) FROM CLINIC_A.PUBLIC.VISIT")
+        cursor.execute("SELECT ID FROM CLINIC_A.PUBLIC.VISIT WHERE DOCTOR_ID = {Doctor_ID} and Patient_ID = {Patient_ID} and Date = {Date}")
         visit_id = cursor.fetchone()[0]
 
         print("✅ Visit recorded successfully!")
