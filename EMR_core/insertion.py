@@ -44,7 +44,10 @@ def add_patient(conn, name, age, gender, occupation, marital_status, address,
                 diagnosis, chief_complaint, medications, investigations, first_visit
             )
         )
-        cursor.execute("SELECT ID FROM CLINIC_A.PUBLIC.PATIENT WHERE NATIONAL_ID = {national_id}")
+        cursor.execute(
+        "SELECT ID FROM CLINIC_A.PUBLIC.PATIENT WHERE NATIONAL_ID = %s",
+        (national_id,)
+                        )
         patient_id = cursor.fetchone()[0]
         print("✅ Patient added successfully!")
         return patient_id
@@ -76,7 +79,9 @@ def add_Doctor(conn, name, age, gender, email, address, Phone,
                 leaves, schedule
             )
         )
-        cursor.execute("SELECT ID FROM CLINIC_A.PUBLIC.DOCTOR WHERE NATIONAL_ID = {national_id}")
+        cursor.execute("SELECT ID FROM CLINIC_A.PUBLIC.DOCTOR WHERE NATIONAL_ID = %s",
+        (national_id,)
+                        )
         doctor_id = cursor.fetchone()[0]
         print("✅ Doctor added successfully!")
         return doctor_id
@@ -105,7 +110,9 @@ def add_Receptionist(conn, name, age, gender, Phone, email, address,
                 national_id, education, leaves, salary
             )
         )
-        cursor.execute("SELECT ID FROM CLINIC_A.PUBLIC.RECEPTIONIST WHERE NATIONAL_ID = {national_id}")
+        cursor.execute("SELECT ID FROM CLINIC_A.PUBLIC.RECEPTIONIST WHERE NATIONAL_ID = %s",
+        (national_id,)
+                        )
         receptionist_id = cursor.fetchone()[0]
         print("✅ Receptionist added successfully!")
         return receptionist_id
@@ -133,7 +140,9 @@ def add_HR(conn, name, age, gender, Phone, email, address,
                 national_id, education, leaves, salary
             )
         )
-        cursor.execute("SELECT ID FROM CLINIC_A.PUBLIC.HR WHERE NATIONAL_ID = {national_id}")
+        cursor.execute("SELECT ID FROM CLINIC_A.PUBLIC.HR WHERE NATIONAL_ID = %s",
+        (national_id,)
+                        )
         hr_id = cursor.fetchone()[0]
         print("✅ HR Member added successfully!")
         return hr_id
