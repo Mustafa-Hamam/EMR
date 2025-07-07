@@ -67,7 +67,7 @@ async def submit_patient(
             diagnosis, chief_complaint, medications, investigations,first_visit
         )
         # Check for error indication
-        if result.lower().startswith("error"):
+        if isinstance(result, str) and result.lower().startswith("error"):
             raise HTTPException(status_code=500, detail=result)
 
     except HTTPException as e:
@@ -109,7 +109,7 @@ async def submit_doctor(
             salary, leaves, schedule_str
         )
         # Check for error indication
-        if result.lower().startswith("error"):
+        if isinstance(result, str) and result.lower().startswith("error"):
             raise HTTPException(status_code=500, detail=result)
     except HTTPException as e:
         # Let FastAPI handle raised HTTPExceptions properly
@@ -145,7 +145,7 @@ async def submit_receptionist(
                 national_id, education, leaves, salary
         )
         # Check for error indication
-        if result.lower().startswith("error"):
+        if isinstance(result, str) and result.lower().startswith("error"):
             raise HTTPException(status_code=500, detail=result)
     except HTTPException as e:
         # Let FastAPI handle raised HTTPExceptions properly
@@ -180,7 +180,7 @@ async def submit_receptionist(
             conn, name, age, gender, Phone, email, address, 
                 national_id, education, leaves, salary)
         # Check for error indication
-        if result.lower().startswith("error"):
+        if isinstance(result, str) and result.lower().startswith("error"):
             raise HTTPException(status_code=500, detail=result)
     except HTTPException as e:
         # Let FastAPI handle raised HTTPExceptions properly
