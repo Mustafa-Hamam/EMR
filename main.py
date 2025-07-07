@@ -242,7 +242,7 @@ async def submit_visit(
 @app.post("/newbooking", response_class=HTMLResponse)
 async def submit_booking(
     request: Request,
-    patient_phone: str = Form(...),
+    patient_phone: int = Form(...),
     patient_name: str = Form(...),
     doctor_id: int = Form(...),
     doctor_name: str = Form(...),
