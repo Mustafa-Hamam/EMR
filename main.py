@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 import uvicorn
 from EMR_core.insertion import auth_snflk, add_patient, add_Doctor, add_Receptionist, add_HR
-from EMR_core.visits import add_visit
+from EMR_core.visits import add_visit, add_booking
 app = FastAPI()
 templates = Jinja2Templates(directory="EMR_core/templates")
 
@@ -30,14 +30,19 @@ async def new_receptionist_form(request: Request):
     return templates.TemplateResponse("newreceptionist.html", {"request": request})
 
 @app.get("/newhr", response_class=HTMLResponse)
-async def new_receptionist_form(request: Request):
+async def new_hr_form(request: Request):
     # Serve the form template
     return templates.TemplateResponse("newhr.html", {"request": request})
 
 @app.get("/newvisit", response_class=HTMLResponse)
-async def new_receptionist_form(request: Request):
+async def new_visit_form(request: Request):
     # Serve the form template
     return templates.TemplateResponse("newvisit.html", {"request": request})
+
+@app.get("/newbooking", response_class=HTMLResponse)
+async def new_receptionist_form(request: Request):
+    # Serve the form template
+    return templates.TemplateResponse("newbooking.html", {"request": request})
 
 @app.post("/newpatient", response_class=HTMLResponse)
 async def submit_patient(
@@ -234,6 +239,65 @@ async def submit_visit(
             "message": f"✅ Visit recorded successfully with ID: {visit_id}"
         }
     )
+@app.post("/newbooking", response_class=HTMLResponse)
+async def submit_booking(
+    request: Request,
+    patient_phone: str = Form(...),
+    patient_name: str = Form(...),
+    doctor_id: int = Form(...),
+    doctor_name: str = Form(...),
+    receptionist_id: int = Form(...),
+    type: str = Form(...),
+    date: str = Form(...),
+    time: str = Form(...),
+    status: str = Form(...)
+):
+    conn = auth_snflk()
+    try:
+        booking_id = add_booking(
+            conn, patient_phone, patient_name, doctor_id, doctor_name,
+            receptionist_id, type, date, time, status
+        )
+
+        if isinstance(booking_id, str) and booking_id.lower().startswith("error"):
+            raise HTTPException(status_code=500, detail=booking_id)
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    finally:
+        conn.close()
+
+    return templates.TemplateResponse(
+        "confirmation.html",
+        {"request": request, "message": f"✅ Booking recorded successfully with ID: {booking_id}"}
+    )
+
+@app.get("/get_patient_name_by_phone")
+async def get_patient_name_by_phone(phone: int):
+    conn = auth_snflk()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT NAME FROM CLINIC_A.PUBLIC.PATIENT WHERE PHONE = %s", (phone,))
+        result = cursor.fetchone()
+        return {"name": result[0] if result else ""}
+    except Exception as e:
+        return {"name": ""}
+    finally:
+        conn.close()
+@app.get("/get_doctor_name_by_id")
+async def get_doctor_name_by_id(id: int):
+    conn = auth_snflk()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT NAME FROM CLINIC_A.PUBLIC.DOCTOR WHERE ID = %s", (id,))
+        result = cursor.fetchone()
+        return {"name": result[0] if result else ""}
+    except Exception as e:
+        return {"name": ""}
+    finally:
+        conn.close()        
 
 # if __name__ == "__main__":
 #     uvicorn.run(app, port=10000, host="0.0.0.0")
