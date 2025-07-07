@@ -33,12 +33,15 @@
 <body>
 <div class="container">
     <h1 class="text-center mb-4">Book Appointment</h1>
-    <form action="/newbooking" method="post" onsubmit="handleFinalValues()">
+    <form action="/newbooking" method="post">
         <label for="patient_phone">Patient Phone</label>
-        <input type="text" class="form-control" id="patient_phone" name="patient_phone" required onblur="fetchPatientName()">
+        <input type="text" class="form-control" id="patient_phone" name="patient_phone" required onblur="fetchPatientDetails()">
 
         <label for="patient_name">Patient Name</label>
-        <input type="text" class="form-control" id="patient_name" name="patient_name" readonly required>
+        <input type="text" class="form-control" id="patient_name" name="patient_name" required>
+
+        <label for="national_id">National ID</label>
+        <input type="text" class="form-control" id="national_id" name="national_id" required>
 
         <label for="doctor_name">Doctor Name</label>
         <select class="form-control" id="doctor_name" name="doctor_name" onchange="setDoctorID()" required>
@@ -59,7 +62,7 @@
             <option value="Re-Assessment">Re-Assessment</option>
             <option value="custom">Other (Enter manually)</option>
         </select>
-        <input type="text" class="form-control mt-2 d-none" id="customTypeInput" placeholder="Enter custom type">
+        <input type="text" class="form-control mt-2 d-none" id="customType" name="type_custom" placeholder="Enter custom type">
 
         <label for="date">Date</label>
         <input type="date" class="form-control" id="date" name="date" required>
@@ -70,26 +73,33 @@
         <label for="status">Booking Status</label>
         <select class="form-control" id="status" name="status" required onchange="handleCustomStatus(this)">
             <option value="">-- Select Status --</option>
+            <option value="Scheduled">Scheduled</option>
             <option value="Checked-Out">Checked-Out</option>
             <option value="Missed">Missed</option>
             <option value="Re-Scheduled">Re-Scheduled</option>
             <option value="Cancelled">Cancelled</option>
-            <option value="Scheduled">Scheduled</option>
             <option value="custom">Other (Enter manually)</option>
         </select>
-        <input type="text" class="form-control mt-2 d-none" id="customStatusInput" placeholder="Enter custom status">
+        <input type="text" class="form-control mt-2 d-none" id="customStatus" name="status_custom" placeholder="Enter custom status">
 
         <button type="submit" class="btn btn-submit">Submit Booking</button>
     </form>
 </div>
 
 <script>
-    async function fetchPatientName() {
+    async function fetchPatientDetails() {
         const phone = document.getElementById("patient_phone").value;
         if (!phone) return;
-        const response = await fetch(`/get_patient_name_by_phone?phone=${phone}`);
+
+        const response = await fetch(`/api/patient_by_phone?phone=${phone}`);
         const data = await response.json();
-        document.getElementById("patient_name").value = data.name || "";
+
+        if (data.name) {
+            document.getElementById("patient_name").value = data.name;
+        }
+        if (data.national_id) {
+            document.getElementById("national_id").value = data.national_id;
+        }
     }
 
     let doctorsMap = {};
@@ -97,6 +107,7 @@
     async function loadDoctors() {
         const response = await fetch("/api/doctors");
         const doctors = await response.json();
+
         const select = document.getElementById("doctor_name");
         doctors.forEach(doc => {
             doctorsMap[doc.name] = doc.id;
@@ -114,29 +125,26 @@
     }
 
     function handleCustomType(select) {
-        const customInput = document.getElementById("customTypeInput");
-        customInput.classList.toggle("d-none", select.value !== "custom");
-        if (select.value !== "custom") customInput.value = "";
+        const input = document.getElementById("customType");
+        input.classList.toggle("d-none", select.value !== "custom");
+        if (select.value === "custom") {
+            input.name = "type";
+            select.name = "type_hidden";
+        } else {
+            input.name = "type_custom";
+            select.name = "type";
+        }
     }
 
     function handleCustomStatus(select) {
-        const customInput = document.getElementById("customStatusInput");
-        customInput.classList.toggle("d-none", select.value !== "custom");
-        if (select.value !== "custom") customInput.value = "";
-    }
-
-    function handleFinalValues() {
-        const typeSelect = document.getElementById("type");
-        const statusSelect = document.getElementById("status");
-        const customType = document.getElementById("customTypeInput").value.trim();
-        const customStatus = document.getElementById("customStatusInput").value.trim();
-
-        if (typeSelect.value === "custom" && customType !== "") {
-            typeSelect.value = customType;
-        }
-
-        if (statusSelect.value === "custom" && customStatus !== "") {
-            statusSelect.value = customStatus;
+        const input = document.getElementById("customStatus");
+        input.classList.toggle("d-none", select.value !== "custom");
+        if (select.value === "custom") {
+            input.name = "status";
+            select.name = "status_hidden";
+        } else {
+            input.name = "status_custom";
+            select.name = "status";
         }
     }
 

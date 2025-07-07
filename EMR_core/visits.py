@@ -54,43 +54,49 @@ def add_visit(conn, Doctor_ID, Doctor_Name, Patient_ID, Patient_name, Type, Date
         cursor.close()
         conn.close()
 
-def add_booking(conn,  Patient_Phone_Number, Patient_Name , Doctor_ID, Doctor_Name, Receptionist_ID,
-                Type ,Date, Time, Status):
+def add_booking(conn, Patient_Phone_Number, Patient_Name, National_ID, Doctor_ID, Doctor_Name, Receptionist_ID,
+                Type, Date, Time, Status):
     cursor = conn.cursor()
     try:
-        # ✅ Check Doctor_ID exists
+        # ✅ Check Doctor exists
         cursor.execute("SELECT 1 FROM CLINIC_A.PUBLIC.DOCTOR WHERE ID = %s", (Doctor_ID,))
         if cursor.fetchone() is None:
             raise ValueError(f"Doctor ID {Doctor_ID} does not exist in the database.")
 
-        # ✅ Check Patient_ID exists
-        cursor.execute("SELECT 1 FROM CLINIC_A.PUBLIC.PATIENT WHERE PHONE = %s", (Patient_Phone_Number,))
-        if cursor.fetchone() is None:
-            raise ValueError(f"Patient PHONE {Patient_Phone_Number} does not exist in the database.")
+        # ✅ Check if patient exists by phone
         cursor.execute("SELECT ID FROM CLINIC_A.PUBLIC.PATIENT WHERE PHONE = %s", (Patient_Phone_Number,))
         result = cursor.fetchone()
-        if result is None:
-            raise ValueError(f"Patient with phone {Patient_Phone_Number} does not exist in the database.")
-        Patient_ID = result[0]
-        # Insert the visit
-        sql = """
-        INSERT INTO CLINIC_A.PUBLIC.BOOKING (
-            Patient_ID,  Patient_Phone_Number, Patient_Name, Doctor_ID, Doctor_Name, Receptionist_ID, Type,
-              Date, Time, Status
-        )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        cursor.execute(
-            sql,
-            (
-                Patient_ID , Patient_Phone_Number, Patient_Name , Doctor_ID, Doctor_Name, Receptionist_ID,
-                Type ,Date, Time, Status
-            )
-        )
 
-        # Fetch the generated ID
+        if result is None:
+            # 🚨 New patient: insert into PATIENT table with basic info
+            cursor.execute("""
+                INSERT INTO CLINIC_A.PUBLIC.PATIENT (NAME, PHONE, NATIONAL_ID)
+                VALUES (%s, %s, %s)
+            """, (Patient_Name, Patient_Phone_Number, National_ID))
+
+            print(f"⚠️ New patient added: {Patient_Name}, Phone: {Patient_Phone_Number}")
+            # Get the generated ID
+            cursor.execute("SELECT ID FROM CLINIC_A.PUBLIC.PATIENT WHERE PHONE = %s", (Patient_Phone_Number,))
+            Patient_ID = cursor.fetchone()[0]
+        else:
+            Patient_ID = result[0]
+
+        # ✅ Insert booking
         cursor.execute("""
-            SELECT BOOKING_ID FROM CLINIC_A.PUBLIC.BOOKING 
+            INSERT INTO CLINIC_A.PUBLIC.BOOKING (
+                Patient_ID, Patient_Phone_Number, Patient_Name,
+                Doctor_ID, Doctor_Name, Receptionist_ID,
+                Type, Date, Time, Status
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            Patient_ID, Patient_Phone_Number, Patient_Name,
+            Doctor_ID, Doctor_Name, Receptionist_ID,
+            Type, Date, Time, Status
+        ))
+        # ✅ Get the booking ID
+        cursor.execute("""
+            SELECT BOOKING_ID FROM CLINIC_A.PUBLIC.BOOKING
             WHERE DOCTOR_ID = %s AND PATIENT_ID = %s AND DATE = %s
             ORDER BY BOOKING_ID DESC LIMIT 1
         """, (Doctor_ID, Patient_ID, Date))
@@ -106,5 +112,9 @@ def add_booking(conn,  Patient_Phone_Number, Patient_Name , Doctor_ID, Doctor_Na
 
     finally:
         cursor.close()
-        conn.close()        
+        conn.close()
+
+
+
+
         
