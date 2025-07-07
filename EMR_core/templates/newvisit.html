@@ -14,6 +14,7 @@
             padding: 2rem;
             min-height: 100vh;
         }
+
         .container {
             background-color: #2c3e50;
             padding: 2rem;
@@ -21,13 +22,16 @@
             max-width: 800px;
             margin: auto;
         }
+
         label {
             font-weight: bold;
             margin-top: 1rem;
         }
+
         .form-control {
             margin-top: 0.5rem;
         }
+
         .btn-submit {
             margin-top: 2rem;
             background-color: #6f42c1;
@@ -37,47 +41,101 @@
             border-radius: 0.5rem;
             width: 100%;
         }
+
+        /* Hide spinners in number inputs */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 class="text-center mb-4">Record New Visit</h1>
         <form action="/newvisit" method="post">
-            <label for="Doctor_ID">Doctor ID</label>
-            <input type="number" class="form-control" id="Doctor_ID" name="Doctor_ID" required>
+            <label for="doctor_id">Doctor ID</label>
+            <input type="number" class="form-control" id="doctor_id" name="Doctor_ID" required>
 
-            <label for="Doctor_Name">Doctor Name</label>
-            <input type="text" class="form-control" id="Doctor_Name" name="Doctor_Name" required>
+            <label for="doctor_name">Doctor Name</label>
+            <input type="text" class="form-control" id="doctor_name" name="Doctor_Name" required>
 
-            <label for="Patient_ID">Patient ID</label>
-            <input type="number" class="form-control" id="Patient_ID" name="Patient_ID" required>
+            <label for="patient_id">Patient ID</label>
+            <input type="number" class="form-control" id="patient_id" name="Patient_ID" required>
 
-            <label for="Patient_name">Patient Name</label>
-            <input type="text" class="form-control" id="Patient_name" name="Patient_name" required>
+            <label for="patient_name">Patient Name</label>
+            <input type="text" class="form-control" id="patient_name" name="Patient_name" required>
 
             <label for="Type">Visit Type</label>
-            <input type="text" class="form-control" id="Type" name="Type" required>
+            <select class="form-control" id="Type" name="Type" required onchange="handleCustomType(this)">
+                <option value="">-- Select Visit Type --</option>
+                <option value="Initial Examination">Initial Examination</option>
+                <option value="Follow Up">Follow Up</option>
+                <option value="Re-Assessment">Re-Assessment</option>
+                <option value="Other">Other</option>
+                <option value="custom">Other (Enter manually)</option>
+            </select>
+            <input type="text" class="form-control mt-2 d-none" id="customType" placeholder="Enter custom type">
 
-            <label for="Date">Date</label>
-            <input type="date" class="form-control" id="Date" name="Date" required>
+            <label for="date">Date</label>
+            <input type="date" class="form-control" id="date" name="Date" required>
 
-            <label for="Time">Time</label>
-            <input type="time" class="form-control" id="Time" name="Time" required>
+            <label for="time">Time</label>
+            <input type="time" class="form-control" id="time" name="Time" required>
 
-            <label for="Notes">Notes</label>
-            <textarea class="form-control" id="Notes" name="Notes" rows="3" required></textarea>
+            <label for="notes">Notes</label>
+            <textarea class="form-control" id="notes" name="Notes" rows="3"></textarea>
 
-            <label for="Prescription">Prescription</label>
-            <textarea class="form-control" id="Prescription" name="Prescription" rows="3" required></textarea>
+            <label for="prescription">Prescription</label>
+            <textarea class="form-control" id="prescription" name="Prescription" rows="3"></textarea>
 
             <label for="Status">Visit Status</label>
-            <input type="text" class="form-control" id="Status" name="Status" required>
+            <select class="form-control" id="Status" name="Status" required onchange="handleCustomStatus(this)">
+                <option value="">-- Select Status --</option>
+                <option value="Checked-Out">Checked-Out</option>
+                <option value="Missed">Missed</option>
+                <option value="Re-Scheduled">Re-Scheduled</option>
+                <option value="Cancelled">Cancelled</option>
+                <option value="custom">Other (Enter manually)</option>
+            </select>
+            <input type="text" class="form-control mt-2 d-none" id="customStatus" placeholder="Enter custom status">
 
-            <label for="Payment">Payment</label>
-            <input type="number" step="1" class="form-control" id="Payment" name="Payment" required>
+            <label for="payment">Payment</label>
+            <input type="number" step="1" class="form-control" id="payment" name="Payment" required>
 
             <button type="submit" class="btn btn-submit">Record Visit</button>
         </form>
     </div>
+
+    <script>
+    function handleCustomType(select) {
+        const customInput = document.getElementById('customType');
+        if (select.value === 'custom') {
+            customInput.classList.remove('d-none');
+            customInput.name = 'Type'; // Replace select's name
+            select.name = '';
+        } else {
+            customInput.classList.add('d-none');
+            customInput.name = '';
+            select.name = 'Type';
+        }
+    }
+
+    function handleCustomStatus(select) {
+        const customInput = document.getElementById('customStatus');
+        if (select.value === 'custom') {
+            customInput.classList.remove('d-none');
+            customInput.name = 'Status';
+            select.name = '';
+        } else {
+            customInput.classList.add('d-none');
+            customInput.name = '';
+            select.name = 'Status';
+        }
+    }
+    </script>
 </body>
 </html>
