@@ -286,16 +286,17 @@ async def get_patient_name_by_phone(phone: int):
         return {"name": ""}
     finally:
         conn.close()
-@app.get("/get_doctor_name_by_id")
-async def get_doctor_name_by_id(id: int):
+@app.get("/api/doctors")
+async def get_doctors():
     conn = auth_snflk()
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT NAME FROM CLINIC_A.PUBLIC.DOCTOR WHERE ID = %s", (id,))
-        result = cursor.fetchone()
-        return {"name": result[0] if result else ""}
+        cursor.execute("SELECT ID, NAME FROM CLINIC_A.PUBLIC.DOCTOR")
+        rows = cursor.fetchall()
+        doctors = [{"id": row[0], "name": row[1]} for row in rows]
+        return doctors
     except Exception as e:
-        return {"name": ""}
+        return []
     finally:
         conn.close()        
 

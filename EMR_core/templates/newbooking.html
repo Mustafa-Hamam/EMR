@@ -40,17 +40,26 @@
         <label for="patient_name">Patient Name</label>
         <input type="text" class="form-control" id="patient_name" name="patient_name" readonly required>
 
-        <label for="doctor_id">Doctor ID</label>
-        <input type="number" class="form-control" id="doctor_id" name="doctor_id" required onblur="fetchDoctorName()">
+       <label for="doctor_name">Doctor Name</label>
+        <select class="form-control" id="doctor_name" name="doctor_name" onchange="setDoctorID()" required>
+            <option value="" disabled selected>Select a doctor</option>
+        </select>
 
-        <label for="doctor_name">Doctor Name</label>
-        <input type="text" class="form-control" id="doctor_name" name="doctor_name" readonly required>
+        <label for="doctor_id">Doctor ID</label>
+        <input type="number" class="form-control" id="doctor_id" name="doctor_id" readonly required>
 
         <label for="receptionist_id">Receptionist ID</label>
         <input type="number" class="form-control" id="receptionist_id" name="receptionist_id" required>
 
-        <label for="type">Visit Type</label>
-        <input type="text" class="form-control" id="type" name="type" required>
+            <label for="Type">Booking Type</label>
+            <select class="form-control" id="Type" name="Type" required onchange="handleCustomType(this)">
+                <option value="">-- Select Visit Type --</option>
+                <option value="Initial Examination">Initial Examination</option>
+                <option value="Follow Up">Follow Up</option>
+                <option value="Re-Assessment">Re-Assessment</option>
+                <option value="custom">Other (Enter manually)</option>
+            </select>
+            <input type="text" class="form-control mt-2 d-none" id="customType" placeholder="Enter custom type">
 
         <label for="date">Date</label>
         <input type="date" class="form-control" id="date" name="date" required>
@@ -58,8 +67,16 @@
         <label for="time">Time</label>
         <input type="time" class="form-control" id="time" name="time" required>
 
-        <label for="status">Status</label>
-        <input type="text" class="form-control" id="status" name="status" required>
+            <label for="Status">Booking Status</label>
+            <select class="form-control" id="Status" name="Status" required onchange="handleCustomStatus(this)">
+                <option value="">-- Select Status --</option>
+                <option value="Attended">Checked-Out</option>
+                <option value="Missed">Missed</option>
+                <option value="Re-Scheduled">Re-Scheduled</option>
+                <option value="Cancelled">Cancelled</option>
+                <option value="custom">Other (Enter manually)</option>
+            </select>
+            <input type="text" class="form-control mt-2 d-none" id="customStatus" placeholder="Enter custom status">
 
         <button type="submit" class="btn btn-submit">Submit Booking</button>
     </form>
@@ -75,14 +92,31 @@
         document.getElementById("patient_name").value = data.name || "";
     }
 
-    async function fetchDoctorName() {
-        const doctorId = document.getElementById("doctor_id").value;
-        if (!doctorId) return;
+    let doctorsMap = {};
 
-        const response = await fetch(`/get_doctor_name_by_id?id=${doctorId}`);
-        const data = await response.json();
-        document.getElementById("doctor_name").value = data.name || "";
+    async function loadDoctors() {
+        const response = await fetch("/api/doctors");
+        const doctors = await response.json();
+
+        const select = document.getElementById("doctor_name");
+        doctors.forEach(doc => {
+            doctorsMap[doc.name] = doc.id;
+            const option = document.createElement("option");
+            option.value = doc.name;
+            option.textContent = doc.name;
+            select.appendChild(option);
+        });
     }
+
+    function setDoctorID() {
+        const selectedName = document.getElementById("doctor_name").value;
+        const doctorId = doctorsMap[selectedName] || "";
+        document.getElementById("doctor_id").value = doctorId;
+    }
+
+    window.onload = function () {
+        loadDoctors();
+    };
 </script>
 </body>
 </html>
