@@ -4,7 +4,7 @@ from fastapi import Request, Form,HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 import uvicorn
-from EMR_core.insertion import auth_snflk, add_patient, add_Doctor, add_Receptionist
+from EMR_core.insertion import auth_snflk, add_patient, add_Doctor, add_Receptionist, add_HR
 
 app = FastAPI()
 templates = Jinja2Templates(directory="EMR_core/templates")
@@ -28,6 +28,11 @@ async def new_doctor_form(request: Request):
 async def new_receptionist_form(request: Request):
     # Serve the form template
     return templates.TemplateResponse("newreceptionist.html", {"request": request})
+
+@app.get("/newhr", response_class=HTMLResponse)
+async def new_receptionist_form(request: Request):
+    # Serve the form template
+    return templates.TemplateResponse("newhr.html", {"request": request})
 
 @app.post("/newpatient", response_class=HTMLResponse)
 async def submit_patient(
@@ -154,41 +159,42 @@ async def submit_receptionist(
         {"request": request, "message": f"✅ Added new receptionist {name} with ID {receptionist_id}"}
     )
 
-# @app.get("/newpatients",  response_class=HTMLResponse)
-# async def patients_report(request: Request):
-#     conn = auth_snflk()
-#     report = new_patients(conn)
-#     html_table = report.to_html(
-#         classes="table table-striped table-bordered", index=False, escape=False
-#     )
-#     return templates.TemplateResponse("table.html", {
-#         "request": request,
-#         "title": "New Patients Report",
-#         "heading": "New Patients Report",
-#         "table": html_table})
-# @app.get("/casesperclinic",  response_class=HTMLResponse)
-# async def cases_report(request: Request):
-#     conn = auth_snflk()
-#     report = cases_clinic(conn)
-#     html_table = report.to_html(
-#         classes="table table-striped table-bordered", index=False, escape=False
-#     )
-#     return templates.TemplateResponse("table.html", {
-#         "request": request,
-#         "title": "Clinic_Cases_Report",
-#         "heading": "Clinic Cases Report",
-#         "table": html_table})
-# @app.get("/monthlyperformance",  response_class=HTMLResponse)
-# async def monthly_report(request: Request):
-#     conn = auth_snflk()
-#     report = monthly_performance(conn)
-#     html_table = report.to_html(
-#         classes="table table-striped table-bordered", index=False, escape=False
-#     )
-#     return templates.TemplateResponse("table.html", {
-#         "request": request,
-#         "title": "Monthly Performance Report",
-#         "heading": "Monthly Performance Report",
-#         "table": html_table})
+@app.post("/newhr", response_class=HTMLResponse)
+async def submit_receptionist(
+    request: Request,
+    hr_id: str = Form(...),
+    name: str = Form(...),
+    age: str = Form(...),
+    gender: str = Form(...),
+    Phone: str = Form(...),
+    email: str = Form(...),
+    address: str = Form(...),   
+    national_id: str = Form(...),
+    education: str = Form(...),
+    leaves: str = Form(...),
+    salary: str = Form(...)
+):
+    conn = auth_snflk()
+    try:
+        result = add_Receptionist(
+            conn, hr_id, name, age, gender, Phone, email, address, 
+                national_id, education, leaves, salary)
+        # Check for error indication
+        if result.lower().startswith("error"):
+            raise HTTPException(status_code=500, detail=result)
+    except HTTPException as e:
+        # Let FastAPI handle raised HTTPExceptions properly
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    finally:
+        conn.close()
+    # Only show success if no error occurred
+    return templates.TemplateResponse(
+        "confirmation.html",
+        {"request": request, "message": f"✅ Added new HR {name} with ID {hr_id}"}
+    )
+
+
 # if __name__ == "__main__":
 #     uvicorn.run(app, port=10000, host="0.0.0.0")

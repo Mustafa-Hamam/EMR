@@ -109,4 +109,31 @@ def add_Receptionist(conn, receptionist_id, name, age, gender, Phone, email, add
     finally:
         cursor.close()
         conn.close()
+def add_HR(conn, hr_id, name, age, gender, Phone, email, address, 
+                national_id, education, leaves, salary):
+    cursor = conn.cursor()
+    try:
+        sql = """
+        INSERT INTO CLINIC_A.PUBLIC.HR (
+            ID, Name, Age, Gender, Phone, Email, Address,
+            National_ID, Education, Leaves, Salary
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(
+            sql,
+            (
+                hr_id, name, age, gender, Phone, email, address, 
+                national_id, education, leaves, salary
+            )
+        )
+        print("✅ HR Member added successfully!")
+        return "HR Member added successfully!"
+    except Exception as e:
+        print(f"❌ Error adding HR Member: {e}")
+        return f"Error adding HR Member: {e}"
+    finally:
+        cursor.close()
+        conn.close()
+        
 
