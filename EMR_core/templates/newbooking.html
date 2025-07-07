@@ -87,6 +87,33 @@
 </div>
 
 <script>
+    function handleCustomStatus(select) {
+        const customInput = document.getElementById("customStatus");
+
+        if (select.value === "custom") {
+            customInput.classList.remove("d-none");
+            customInput.required = true;
+        } else {
+            customInput.classList.add("d-none");
+            customInput.required = false;
+        }
+    }
+
+    // ✅ Overwrite the 'status' value with custom input if applicable
+    document.querySelector("form").addEventListener("submit", function (e) {
+        const statusSelect = document.getElementById("status");
+        const customStatus = document.getElementById("customStatus");
+
+        if (statusSelect.value === "custom" && customStatus.value.trim() !== "") {
+            const hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = "status";
+            hidden.value = customStatus.value.trim();
+            this.appendChild(hidden);
+
+            statusSelect.disabled = true;
+        }
+    });
     async function fetchPatientDetails() {
         const phone = document.getElementById("patient_phone").value;
         if (!phone) return;
