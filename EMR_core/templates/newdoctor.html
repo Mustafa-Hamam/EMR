@@ -41,6 +41,10 @@
             border-radius: 0.5rem;
             width: 100%;
         }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -55,7 +59,11 @@
             <input type="number" class="form-control" id="age" name="age" required>
 
             <label for="gender">Gender</label>
-            <input type="text" class="form-control" id="gender" name="gender" required>
+            <select class="form-control" id="gender" name="gender" required>
+                <option value="" disabled selected>Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
 
             <label for="email">Email</label>
             <input type="email" class="form-control" id="email" name="email" required>
@@ -70,10 +78,36 @@
             <input type="text" class="form-control" id="national_id" name="national_id" required>
 
             <label for="degree">Degree</label>
-            <input type="text" class="form-control" id="degree" name="degree" required>
+            <select class="form-control" id="degree" name="degree" required onchange="toggleDegreeInput()">
+                <option value="" disabled selected>Select degree</option>
+                <option value="MBBS">MBBS</option>
+                <option value="MBBCh">MBBCh</option>
+                <option value="MD">MD</option>
+                <option value="DO">DO</option>
+                <option value="PhD">PhD</option>
+                <option value="MSc">MSc</option>
+                <option value="Fellowship">Fellowship</option>
+                <option value="Physiotherapy">Physiotherapy</option>
+                <option value="Other">Other</option>
+            </select>
+            <input type="text" class="form-control hidden" id="degree_other" name="degree_other" placeholder="Enter degree">
 
             <label for="specialty">Specialty</label>
-            <input type="text" class="form-control" id="specialty" name="specialty" required>
+            <select class="form-control" id="specialty" name="specialty" required onchange="toggleSpecialtyInput()">
+                <option value="" disabled selected>Select specialty</option>
+                <option value="General Practice">General Practice</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Dermatology">Dermatology</option>
+                <option value="Neurology">Neurology</option>
+                <option value="Orthopedics">Orthopedics</option>
+                <option value="Psychiatry">Psychiatry</option>
+                <option value="Radiology">Radiology</option>
+                <option value="Surgery">Surgery</option>
+                <option value="Physiotherapy">Physiotherapy</option>
+                <option value="Other">Other</option>
+            </select>
+            <input type="text" class="form-control hidden" id="specialty_other" name="specialty_other" placeholder="Enter specialty">
 
             <label for="certifications">Certifications</label>
             <input type="text" class="form-control" id="certifications" name="certifications">
@@ -119,5 +153,19 @@
             <button type="submit" class="btn btn-submit">Submit Doctor Data</button>
         </form>
     </div>
+
+    <script>
+        function toggleDegreeInput() {
+            const degree = document.getElementById("degree").value;
+            const input = document.getElementById("degree_other");
+            input.classList.toggle("hidden", degree !== "Other");
+        }
+
+        function toggleSpecialtyInput() {
+            const specialty = document.getElementById("specialty").value;
+            const input = document.getElementById("specialty_other");
+            input.classList.toggle("hidden", specialty !== "Other");
+        }
+    </script>
 </body>
 </html>
