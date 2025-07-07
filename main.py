@@ -274,16 +274,24 @@ async def submit_booking(
         {"request": request, "message": f"✅ Booking recorded successfully with ID: {booking_id}"}
     )
 
-@app.get("/get_patient_name_by_phone")
-async def get_patient_name_by_phone(phone: int):
+@app.get("/api/patient_by_phone")
+async def get_patient_by_phone(phone: int):
     conn = auth_snflk()
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT NAME FROM CLINIC_A.PUBLIC.PATIENT WHERE PHONE = %s", (phone,))
+        cursor.execute("""
+            SELECT NAME, NATIONAL_ID 
+            FROM CLINIC_A.PUBLIC.PATIENT 
+            WHERE PHONE = %s
+        """, (phone,))
         result = cursor.fetchone()
-        return {"name": result[0] if result else ""}
+
+        if result:
+            return {"name": result[0], "national_id": result[1]}
+        else:
+            return {"name": "", "national_id": ""}
     except Exception as e:
-        return {"name": ""}
+        return {"name": "", "national_id": ""}
     finally:
         conn.close()
 @app.get("/api/doctors")
