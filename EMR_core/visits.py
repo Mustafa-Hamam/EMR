@@ -38,7 +38,7 @@ def add_visit(conn, Doctor_ID, Doctor_Name, Patient_ID, Patient_name, Type, Date
         cursor.execute("""
             SELECT VISIT_ID FROM CLINIC_A.PUBLIC.VISIT 
             WHERE DOCTOR_ID = %s AND PATIENT_ID = %s AND DATE = %s
-            ORDER BY ID DESC LIMIT 1
+            ORDER BY VISIT_ID DESC LIMIT 1
         """, (Doctor_ID, Patient_ID, Date))
 
         visit_id = cursor.fetchone()[0]
