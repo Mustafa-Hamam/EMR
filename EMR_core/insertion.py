@@ -23,29 +23,31 @@ def auth_snflk():
     )
     return conn
 
-def add_patient(conn, patient_id, name, age, gender, occupation, marital_status, address,
+def add_patient(conn, name, age, gender, occupation, marital_status, address,
                 email, phone, national_id, insurance, insurance_card_id,
                 diagnosis, chief_complaint, medications, investigations,first_visit):
     cursor = conn.cursor()
     try:
         sql = """
         INSERT INTO CLINIC_A.PUBLIC.PATIENT (
-            ID, NAME, AGE, GENDER, OCCUPATION, MARITAL_STATUS, ADDRESS,
+            NAME, AGE, GENDER, OCCUPATION, MARITAL_STATUS, ADDRESS,
             EMAIL, PHONE, NATIONAL_ID, INSURANCE, INSURANCE_CARD_ID,
             DIAGNOSIS, CHIEF_COMPLAINT, MEDICATIONS, INVESTIGATIONS,FIRST_VISIT
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
         """
         cursor.execute(
             sql,
             (
-                patient_id, name, age, gender, occupation, marital_status, address,
+                name, age, gender, occupation, marital_status, address,
                 email, phone, national_id, insurance, insurance_card_id,
                 diagnosis, chief_complaint, medications, investigations, first_visit
             )
         )
+        cursor.execute("SELECT MAX(ID) FROM CLINIC_A.PUBLIC.PATIENT")
+        patient_id = cursor.fetchone()[0]
         print("✅ Patient added successfully!")
-        return "Patient added successfully!"
+        return patient_id
     except Exception as e:
         print(f"❌ Error adding patient: {e}")
         return f"Error adding patient: {e}"
@@ -53,29 +55,31 @@ def add_patient(conn, patient_id, name, age, gender, occupation, marital_status,
         cursor.close()
         conn.close()
 
-def add_Doctor(conn, doctor_id, name, age, gender, email, address, Phone,
+def add_Doctor(conn, name, age, gender, email, address, Phone,
                 national_id, degree, specialty, certifications, salary,
                 leaves, schedule):
     cursor = conn.cursor()
     try:
         sql = """
         INSERT INTO CLINIC_A.PUBLIC.DOCTOR (
-            ID, Name, Age, Gender, Email, Address, Phone,
+            Name, Age, Gender, Email, Address, Phone,
             National_id, Degree, Specialty, Certifications, Salary,
             Leaves, Schedule
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(
             sql,
             (
-                doctor_id, name, age, gender, email, address, Phone,
+                name, age, gender, email, address, Phone,
                 national_id, degree, specialty, certifications, salary,
                 leaves, schedule
             )
         )
+        cursor.execute("SELECT MAX(ID) FROM CLINIC_A.PUBLIC.DOCTOR")
+        doctor_id = cursor.fetchone()[0]
         print("✅ Doctor added successfully!")
-        return "Doctor added successfully!"
+        return doctor_id
     except Exception as e:
         print(f"❌ Error adding Doctor: {e}")
         return f"Error adding Doctor: {e}"
@@ -83,57 +87,61 @@ def add_Doctor(conn, doctor_id, name, age, gender, email, address, Phone,
         cursor.close()
         conn.close()
 
-def add_Receptionist(conn, receptionist_id, name, age, gender, Phone, email, address, 
+def add_Receptionist(conn, name, age, gender, Phone, email, address, 
                 national_id, education, leaves, salary):
     cursor = conn.cursor()
     try:
         sql = """
         INSERT INTO CLINIC_A.PUBLIC.RECEPTIONIST (
-            ID, Name, Age, Gender, Phone, Email, Address,
+            Name, Age, Gender, Phone, Email, Address,
             National_ID, Education, Leaves, Salary
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(
             sql,
             (
-                receptionist_id, name, age, gender, Phone, email, address, 
+                name, age, gender, Phone, email, address, 
                 national_id, education, leaves, salary
             )
         )
+        cursor.execute("SELECT MAX(ID) FROM CLINIC_A.PUBLIC.RECEPTIONIST")
+        receptionist_id = cursor.fetchone()[0]
         print("✅ Receptionist added successfully!")
-        return "Receptionist added successfully!"
+        return receptionist_id
     except Exception as e:
         print(f"❌ Error adding Receptionist: {e}")
         return f"Error adding Receptionist: {e}"
     finally:
         cursor.close()
         conn.close()
-def add_HR(conn, hr_id, name, age, gender, Phone, email, address, 
+def add_HR(conn, name, age, gender, Phone, email, address, 
                 national_id, education, leaves, salary):
     cursor = conn.cursor()
     try:
         sql = """
         INSERT INTO CLINIC_A.PUBLIC.HR (
-            ID, Name, Age, Gender, Phone, Email, Address,
+            Name, Age, Gender, Phone, Email, Address,
             National_ID, Education, Leaves, Salary
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(
             sql,
             (
-                hr_id, name, age, gender, Phone, email, address, 
+                name, age, gender, Phone, email, address, 
                 national_id, education, leaves, salary
             )
         )
+        cursor.execute("SELECT MAX(ID) FROM CLINIC_A.PUBLIC.HR")
+        hr_id = cursor.fetchone()[0]
         print("✅ HR Member added successfully!")
-        return "HR Member added successfully!"
+        return hr_id
     except Exception as e:
         print(f"❌ Error adding HR Member: {e}")
         return f"Error adding HR Member: {e}"
     finally:
         cursor.close()
         conn.close()
-        
+
 
