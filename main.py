@@ -4,7 +4,7 @@ from fastapi import Request, Form,HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 import uvicorn
-from EMR_core.insertion import auth_snflk, add_patient, add_Doctor, add_Receptionist, add_HR
+from EMR_core.insertion import auth_snflk, add_patient, add_Doctor, add_Receptionist, add_HR, add_Case
 from EMR_core.visits import add_visit, add_booking
 app = FastAPI()
 templates = Jinja2Templates(directory="EMR_core/templates")
@@ -40,9 +40,14 @@ async def new_visit_form(request: Request):
     return templates.TemplateResponse("newvisit.html", {"request": request})
 
 @app.get("/newbooking", response_class=HTMLResponse)
-async def new_receptionist_form(request: Request):
+async def new_booking_form(request: Request):
     # Serve the form template
     return templates.TemplateResponse("newbooking.html", {"request": request})
+
+@app.get("/newcase", response_class=HTMLResponse)
+async def new_case_form(request: Request):
+    # Serve the form template
+    return templates.TemplateResponse("newcase.html", {"request": request})
 
 @app.post("/newpatient", response_class=HTMLResponse)
 async def submit_patient(
@@ -272,8 +277,53 @@ async def submit_booking(
 
     return templates.TemplateResponse(
         "confirmation.html",
-        {"request": request, "message": f"✅ Booking recorded successfully with ID: {booking_id}"}
+        {"request": request, "message": f"✅ Booking recorded successfully with ID {booking_id}"}
     )
+@app.post("/newcase", response_class=HTMLResponse)
+async def submit_case(
+    request: Request,
+    patient_phone: int = Form(...),
+    start_date: str = Form(...),
+    case_type: str = Form(...),
+    history: str = Form(...),
+    chronic_diseases: str = Form(...),
+    pain_scale: str = Form(...),
+    signs_symptoms: str = Form(...),
+    chief_complaint: str = Form(...),
+    medications: str = Form(...),
+    investigations: str = Form(...),
+    special_tests: str = Form(...),
+    diagnosis: str = Form(...),
+    referred_diagnosis: str = Form(...),
+    treatment_plan: str = Form(...),
+    notes: str = Form(...),
+    end_date: str = Form(...),
+    end_note: str = Form(...)
+):
+    conn = auth_snflk()
+    try:
+        result = add_Case(
+            conn, patient_phone, start_date, case_type, history, chronic_diseases, 
+            pain_scale, signs_symptoms, chief_complaint, medications, investigations,
+            special_tests, diagnosis, referred_diagnosis, treatment_plan, notes,
+            end_date, end_note
+        )
+        # Check for error indication
+        if isinstance(result, str) and result.lower().startswith("error"):
+            raise HTTPException(status_code=500, detail=result)
+    except HTTPException as e:
+        # Let FastAPI handle raised HTTPExceptions properly
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    finally:
+        conn.close()
+    # Only show success if no error occurred
+    return templates.TemplateResponse(
+        "confirmation.html",
+        {"request": request, "message": f"✅ Added new case with ID {result}"}
+    )
+
 
 @app.get("/api/patient_by_phone")
 async def get_patient_by_phone(phone: int):
@@ -281,18 +331,30 @@ async def get_patient_by_phone(phone: int):
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT NAME, NATIONAL_ID 
+            SELECT NAME, NATIONAL_ID, ID 
             FROM CLINIC_A.PUBLIC.PATIENT 
             WHERE PHONE = %s
         """, (phone,))
         result = cursor.fetchone()
 
         if result:
-            return {"name": result[0], "national_id": result[1]}
+            return {
+                "name": result[0],
+                "national_id": result[1],
+                "id": result[2]  #Return the ID
+            }
         else:
-            return {"name": "", "national_id": ""}
+            return {
+                "name": "",
+                "national_id": "",
+                "id": ""
+            }
     except Exception as e:
-        return {"name": "", "national_id": ""}
+        return {
+            "name": "",
+            "national_id": "",
+            "id": ""
+        }
     finally:
         conn.close()
 @app.get("/api/doctors")

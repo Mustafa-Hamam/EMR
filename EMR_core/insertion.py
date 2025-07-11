@@ -153,4 +153,44 @@ def add_HR(conn, name, age, gender, Phone, email, address,
         cursor.close()
         conn.close()
 
+def add_Case(conn, patient_phone, start_date, case_type, history, chronic_diseases, pain_scale, 
+                signs_symptoms, chief_complaint, medications, investigations, special_tests,
+                diagnosis, referred_diagnosis, treatment_plan, notes, end_date, end_note):
+    cursor = conn.cursor()
+    cursor.execute("SELECT ID FROM CLINIC_A.PUBLIC.PATIENT WHERE PHONE = %s", (patient_phone,))
+    result = cursor.fetchone()
+    patient_id = result[0]
+    
+    try:
+        sql = """
+        INSERT INTO CLINIC_A.PUBLIC.CASES (
+            PATIENT_ID, START_DATE,
+            CASE_TYPE, HISTORY, CHRONIC_DISEASES, PAIN_SCALE,
+            SIGNS_SYMPTOMS, CHIEF_COMPLAINT, MEDICATIONS, INVESTIGATIONS,
+            SPECIAL_TESTS, DIAGNOSIS, REFERRED_DIAGNOSIS, TREATMENT_PLAN, NOTES ,
+            END_DATE , END_NOTE 
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s,%s,%s,%s,%s,%s,%s)
+        """
+        cursor.execute(
+            sql,
+            (
+                patient_id, start_date, case_type, history, chronic_diseases, pain_scale, 
+                signs_symptoms, chief_complaint, medications, investigations, special_tests,
+                diagnosis, referred_diagnosis, treatment_plan, notes, end_date, end_note
+            )
+        )
+        cursor.execute("SELECT CASE_ID FROM CLINIC_A.PUBLIC.CASES WHERE PATINET_ID = %s",
+        (patient_id,)
+                        )
+        case_id = cursor.fetchone()[0]
+        print("✅ Case {case_id} added successfully!")
+        return case_id
+    except Exception as e:
+        print(f"❌ Error adding Case: {e}")
+        return f"Error adding Case: {e}"
+    finally:
+        cursor.close()
+        conn.close()        
+
 
