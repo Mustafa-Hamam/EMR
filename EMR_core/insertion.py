@@ -180,7 +180,7 @@ def add_Case(conn, patient_phone, start_date, case_type, history, chronic_diseas
                 diagnosis, referred_diagnosis, treatment_plan, notes, end_date, end_note
             )
         )
-        cursor.execute("SELECT CASE_ID FROM CLINIC_A.PUBLIC.CASES WHERE PATINET_ID = %s",
+        cursor.execute("SELECT CASE_ID FROM CLINIC_A.PUBLIC.CASES WHERE PATIENT_ID = %s",
         (patient_id,)
                         )
         case_id = cursor.fetchone()[0]
