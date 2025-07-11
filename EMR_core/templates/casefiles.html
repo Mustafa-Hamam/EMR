@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Case Files</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #2c3e50;
+            color: white;
+            padding: 2rem;
+        }
+        .container {
+            background-color: #34495e;
+            border-radius: 1rem;
+            padding: 2rem;
+        }
+        .form-control, .btn {
+            margin-top: 1rem;
+        }
+        .file-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #3b5998;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .file-entry a {
+            color: #f1c40f;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center mb-4">Patient Case Files</h2>
+
+    <!-- 🔍 Search Section -->
+    <div class="mb-3">
+        <label for="phone" class="form-label">Enter Patient Phone Number</label>
+        <input type="text" id="phone" class="form-control" placeholder="e.g. 01012345678" onblur="fetchFiles()">
+    </div>
+
+    <!-- 📂 Files List -->
+    <div id="file-list" class="mt-4">
+        <h5>Uploaded Files:</h5>
+        <div id="files-container"></div>
+    </div>
+
+    <!-- ⬆️ Upload Section -->
+    <form id="upload-form" action="/upload_casefile" method="post" enctype="multipart/form-data" class="mt-4">
+        <h5>Upload New File:</h5>
+        <input type="hidden" name="phone" id="upload_phone">
+        <input type="file" name="file" class="form-control" required>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+</div>
+
+<script>
+    async function fetchFiles() {
+        const phone = document.getElementById("phone").value;
+        document.getElementById("upload_phone").value = phone;
+
+        const res = await fetch(`/api/casefiles?phone=${phone}`);
+        const files = await res.json();
+
+        const container = document.getElementById("files-container");
+        container.innerHTML = "";
+
+        if (files.length === 0) {
+            container.innerHTML = "<p>No files found for this patient.</p>";
+            return;
+        }
+
+        files.forEach(file => {
+            const div = document.createElement("div");
+            div.className = "file-entry";
+            div.innerHTML = `
+                <span>${file.filename}</span>
+                <div>
+                    <a href="${file.url}" target="_blank" class="btn btn-sm btn-outline-light me-2">View</a>
+                    <button class="btn btn-sm btn-danger" onclick="deleteFile('${file.filename}')">Delete</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    async function deleteFile(filename) {
+        const phone = document.getElementById("phone").value;
+        if (!confirm(`Delete file: ${filename}?`)) return;
+
+        const res = await fetch(`/delete_casefile?filename=${filename}&phone=${phone}`, { method: "DELETE" });
+        if (res.ok) {
+            alert("File deleted successfully.");
+            fetchFiles();
+        } else {
+            alert("Failed to delete file.");
+        }
+    }
+</script>
+</body>
+</html>

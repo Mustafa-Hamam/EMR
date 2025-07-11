@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi import Request, Form,HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+import os
 import uvicorn
 from EMR_core.insertion import auth_snflk, add_patient, add_Doctor, add_Receptionist, add_HR, add_Case
 from EMR_core.visits import add_visit, add_booking
@@ -48,6 +49,11 @@ async def new_booking_form(request: Request):
 async def new_case_form(request: Request):
     # Serve the form template
     return templates.TemplateResponse("newcase.html", {"request": request})
+
+@app.get("/upload_case_file", response_class=HTMLResponse)
+async def new_case_file_form(request: Request):
+    # Serve the form template
+    return templates.TemplateResponse("casefiles.html", {"request": request})
 
 @app.post("/newpatient", response_class=HTMLResponse)
 async def submit_patient(
@@ -324,6 +330,59 @@ async def submit_case(
         {"request": request, "message": f"✅ Added new case with ID {result}"}
     )
 
+@app.post("/upload_case_file", response_class=HTMLResponse)
+async def upload_case_file(
+    request: Request,
+    phone: int = Form(...),
+    file: UploadFile = Form(...)
+):
+    conn = auth_snflk()
+    cursor = conn.cursor()
+    try:
+        # ✅ Read file content
+        file_bytes = await file.read()
+
+        # ✅ Save temporarily on disk
+        os.makedirs("/tmp/case_files", exist_ok=True)
+        safe_filename = file.filename.replace(" ", "_")  # sanitize filename
+        temp_path = f"/tmp/case_files/{safe_filename}"
+        with open(temp_path, "wb") as f:
+            f.write(file_bytes)
+
+        # ✅ Get case ID from patient phone
+        cursor.execute("""
+            SELECT CASE_ID
+            FROM CLINIC_A.PUBLIC.PATIENT P
+            JOIN CLINIC_A.PUBLIC.CASES C ON P.ID = C.PATIENT_ID
+            WHERE P.PHONE = %s
+            ORDER BY C.START_DATE DESC
+            LIMIT 1
+        """, (phone,))
+        result = cursor.fetchone()
+
+        if not result:
+            return HTMLResponse("<h3>❌ No case found for this patient phone number.</h3>")
+
+        case_id = result[0]
+
+        # ✅ Upload to internal stage (CASE_FILES_STAGE)
+        put_command = f"""
+            PUT file://{temp_path} @CASE_FILES_STAGE/case_{case_id}/ auto_compress=true;
+        """
+        cursor.execute(put_command)
+
+        return HTMLResponse(f"<h3>✅ File '{safe_filename}' uploaded for case ID {case_id}</h3>")
+
+    except Exception as e:
+        return HTMLResponse(f"<h3>❌ Error uploading file: {e}</h3>")
+
+    finally:
+        cursor.close()
+        conn.close()
+
+        # 🧹 Optional: clean up temp file
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
 
 @app.get("/api/patient_by_phone")
 async def get_patient_by_phone(phone: int):
