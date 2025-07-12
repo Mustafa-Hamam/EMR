@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi import UploadFile, File, Form, Request,HTTPException, UploadFile
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-import os
+import os, re
 import uvicorn
 from EMR_core.insertion import auth_snflk, add_patient, add_Doctor, add_Receptionist, add_HR, add_Case
 from EMR_core.visits import add_visit, add_booking
@@ -359,7 +359,7 @@ async def upload_case_file(
 
         for file in files:
             file_bytes = await file.read()
-            safe_filename = file.filename.replace(" ", "_")
+            safe_filename = re.sub(r"[()\s]", "_", file.filename)
             filename = f"case_{case_id}__{safe_filename}"
             temp_path = f"/tmp/case_files/{filename}"
 
