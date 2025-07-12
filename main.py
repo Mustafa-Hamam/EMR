@@ -360,11 +360,12 @@ async def upload_case_file(
         for file in files:
             file_bytes = await file.read()
             safe_filename = file.filename.replace(" ", "_")
-            temp_path = f"/tmp/case_files/{safe_filename}"
+            filename = f"case_{case_id}__{safe_filename}"
+            temp_path = f"/tmp/case_files/{filename}"
 
             with open(temp_path, "wb") as f:
                 f.write(file_bytes)
-            put_command = f"PUT file://{temp_path} @CLINIC_A.PUBLIC.CASE_FILES_STAGE/case_{case_id}.JPG"
+            put_command = f"PUT file://{temp_path} @CASE_FILES_STAGE auto_compress=true"
             cursor.execute(put_command)
             uploaded.append(safe_filename)
 
