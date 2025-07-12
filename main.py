@@ -2,7 +2,7 @@ from typing import List
 from fastapi import FastAPI
 from fastapi import UploadFile, File, Form, Request,HTTPException, UploadFile
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 import os, re
 import uvicorn
 from EMR_core.insertion import auth_snflk, add_patient, add_Doctor, add_Receptionist, add_HR, add_Case
@@ -54,6 +54,77 @@ async def new_case_form(request: Request):
 async def new_case_file_form(request: Request):
     # Serve the form template
     return templates.TemplateResponse("casefiles.html", {"request": request})
+
+@app.get("/api/casefiles")
+async def list_case_files(phone: int):
+    conn = auth_snflk()
+    cursor = conn.cursor()
+    try:
+        # Get case ID from phone
+        cursor.execute("""
+            SELECT C.CASE_ID
+            FROM CLINIC_A.PUBLIC.PATIENT P
+            JOIN CLINIC_A.PUBLIC.CASES C ON P.ID = C.PATIENT_ID
+            WHERE P.PHONE = %s
+            ORDER BY C.START_DATE DESC
+            LIMIT 1
+        """, (phone,))
+        result = cursor.fetchone()
+
+        if not result:
+            return []
+
+        case_id = result[0]
+
+        # List files in the stage
+        cursor.execute(f"LIST @CLINIC_A.PUBLIC.CASE_FILES_STAGE/case_{case_id}/")
+        rows = cursor.fetchall()
+
+        files = []
+        for row in rows:
+            stage_path = row[0]  # e.g., 'case_12/image1.jpg.gz'
+            filename = stage_path.split("/")[-1]
+            files.append({
+                "filename": filename,
+                "url": f"/view_casefile?case_id={case_id}&filename={filename}"
+            })
+
+        return files
+
+    except Exception as e:
+        return []
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.get("/view_casefile")
+async def view_casefile(case_id: int, filename: str):
+    conn = auth_snflk()
+    cursor = conn.cursor()
+    try:
+        # Download file into Snowflake internal temp table
+        cursor.execute(f"""
+            GET @CLINIC_A.PUBLIC.CASE_FILES_STAGE/case_{case_id}/{filename}
+            file://tmp_case_file auto_compress=false;
+        """)
+        local_path = f"tmp_case_file/{filename}"
+        if not os.path.exists(local_path):
+            raise HTTPException(status_code=404, detail="File not found")
+
+        ext = filename.split(".")[-1].lower()
+        media_type = "image/jpeg"
+        if ext == "png":
+            media_type = "image/png"
+        elif ext == "pdf":
+            media_type = "application/pdf"
+
+        return FileResponse(local_path, media_type=media_type, filename=filename)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.post("/newpatient", response_class=HTMLResponse)
 async def submit_patient(
