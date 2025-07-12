@@ -23,15 +23,10 @@
             border-radius: 0.5rem;
             margin-bottom: 1rem;
         }
-        .file-entry img,
-        .file-entry iframe {
-            display: block;
-            max-width: 100%;
-            margin-top: 0.5rem;
+        .file-preview {
+            max-height: 200px;
             border-radius: 0.5rem;
-        }
-        .file-entry a {
-            color: #f1c40f;
+            margin-top: 0.5rem;
         }
     </style>
 </head>
@@ -39,10 +34,13 @@
 <div class="container">
     <h2 class="text-center mb-4">Patient Case Files</h2>
 
-    <!-- 🔍 Search Section -->
-    <div class="mb-3">
+    <!-- 🔍 Phone Input -->
+    <div class="mb-4">
         <label for="phone" class="form-label">Enter Patient Phone Number</label>
-        <input type="text" id="phone" class="form-control" placeholder="e.g. 01012345678" onblur="fetchFiles()">
+        <input type="text" id="phone" class="form-control" placeholder="e.g. 01012345678">
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-success mt-3" onclick="fetchFiles()">🔍 View Files</button>
+        </div>
     </div>
 
     <!-- 📂 Files List -->
@@ -51,18 +49,22 @@
         <div id="files-container"></div>
     </div>
 
-    <!-- ⬆️ Upload Section -->
+    <!-- ⬆️ Upload Form -->
     <form id="upload-form" action="/upload_case_file" method="post" enctype="multipart/form-data">
-        <h5>Upload New File(s):</h5>
+        <h5 class="mt-5">Upload New File(s):</h5>
         <input type="hidden" name="phone" id="upload_phone">
         <input type="file" name="files" class="form-control" multiple required>
-        <button type="submit" class="btn btn-primary">Upload</button>
+        <button type="submit" class="btn btn-primary">📤 Upload</button>
     </form>
 </div>
 
 <script>
     async function fetchFiles() {
         const phone = document.getElementById("phone").value;
+        if (!phone) {
+            alert("Please enter a valid phone number.");
+            return;
+        }
         document.getElementById("upload_phone").value = phone;
 
         const res = await fetch(`/api/casefiles?phone=${phone}`);
@@ -81,18 +83,20 @@
             div.className = "file-entry";
 
             let previewHTML = '';
-            if (file.filename.endsWith('.jpg') || file.filename.endsWith('.jpeg') || file.filename.endsWith('.png')) {
-                previewHTML = `<img src="${file.url}" alt="${file.filename}" style="max-height:200px;" />`;
-            } else if (file.filename.endsWith('.pdf')) {
-                previewHTML = `<iframe src="${file.url}" width="100%" height="300px" style="border:none;"></iframe>`;
+            const filename = file.filename.toLowerCase();
+
+            if (filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".png")) {
+                previewHTML = `<img src="${file.url}" alt="${file.filename}" class="file-preview" />`;
+            } else if (filename.endsWith(".pdf")) {
+                previewHTML = `<iframe src="${file.url}" width="100%" height="300px" class="file-preview"></iframe>`;
             } else {
                 previewHTML = `<a href="${file.url}" target="_blank">${file.filename}</a>`;
             }
 
             div.innerHTML = `
                 <strong>${file.filename}</strong>
-                <div class="mt-2">${previewHTML}</div>
-                <button class="btn btn-sm btn-danger mt-2" onclick="deleteFile('${file.filename}')">Delete</button>
+                <div>${previewHTML}</div>
+                <button class="btn btn-sm btn-danger mt-2" onclick="deleteFile('${file.filename}')">🗑️ Delete</button>
             `;
 
             container.appendChild(div);
