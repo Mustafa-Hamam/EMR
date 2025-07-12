@@ -35,18 +35,17 @@
         }
 
         .btn-custom {
-            font-size: 1.3rem;
-            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            padding: 1.25rem 2.5rem;
             border: none;
             border-radius: 0.5rem;
             width: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
         }
 
-        .btn-custom i {
-            margin-right: 0.75rem;
+        .btn-custom:hover {
+            box-shadow: 0 0 15px 4px rgba(255, 255, 255, 0.6);
+            transform: scale(1.03);
         }
 
         .btn-addpatient { background-color: #6f42c1; color: white; }
