@@ -160,7 +160,7 @@ def add_Case(conn, patient_phone, start_date, case_type, history, chronic_diseas
     cursor.execute("SELECT ID FROM CLINIC_A.PUBLIC.PATIENT WHERE PHONE = %s", (patient_phone,))
     result = cursor.fetchone()
     patient_id = result[0]
-    
+    end_date = end_date if end_date.strip() else None
     try:
         sql = """
         INSERT INTO CLINIC_A.PUBLIC.CASES (
