@@ -367,7 +367,7 @@ async def upload_case_file(
 
         # ✅ Upload to internal stage (CASE_FILES_STAGE)
         put_command = f"""
-            PUT file://{temp_path} @CASE_FILES_STAGE/case_{case_id}/ auto_compress=true;
+            PUT file://{temp_path} @CLINIC_A.PUBLIC.CASE_FILES_STAGE/case_{case_id}/ auto_compress=true;
         """
         cursor.execute(put_command)
 
