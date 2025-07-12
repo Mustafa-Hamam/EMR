@@ -334,22 +334,11 @@ async def submit_case(
 async def upload_case_file(
     request: Request,
     phone: int = Form(...),
-    file: UploadFile = Form(...)
+    files: List[UploadFile] = File(...)
 ):
     conn = auth_snflk()
     cursor = conn.cursor()
     try:
-        # ✅ Read file content
-        file_bytes = await file.read()
-
-        # ✅ Save temporarily on disk
-        os.makedirs("/tmp/case_files", exist_ok=True)
-        safe_filename = file.filename.replace(" ", "_")  # sanitize filename
-        temp_path = f"/tmp/case_files/{safe_filename}"
-        with open(temp_path, "wb") as f:
-            f.write(file_bytes)
-
-        # ✅ Get case ID from patient phone
         cursor.execute("""
             SELECT CASE_ID
             FROM CLINIC_A.PUBLIC.PATIENT P
@@ -365,24 +354,34 @@ async def upload_case_file(
 
         case_id = result[0]
 
-        # ✅ Upload to internal stage (CASE_FILES_STAGE)
-        put_command = f"""
-            PUT file://{temp_path} @CLINIC_A.PUBLIC.CASE_FILES_STAGE/case_{case_id}/ auto_compress=true;
-        """
-        cursor.execute(put_command)
+        os.makedirs("/tmp/case_files", exist_ok=True)
+        uploaded = []
 
-        return HTMLResponse(f"<h3>✅ File '{safe_filename}' uploaded for case ID {case_id}</h3>")
+        for file in files:
+            file_bytes = await file.read()
+            safe_filename = file.filename.replace(" ", "_")
+            temp_path = f"/tmp/case_files/{safe_filename}"
+
+            with open(temp_path, "wb") as f:
+                f.write(file_bytes)
+
+            put_command = f"""
+                PUT file://{temp_path} @CLINIC_A.PUBLIC.CASE_FILES_STAGE/case_{case_id}/ auto_compress=true;
+            """
+            cursor.execute(put_command)
+            uploaded.append(safe_filename)
+
+            # Clean up
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+
+        return HTMLResponse(f"<h3>✅ Uploaded files: {', '.join(uploaded)}</h3>")
 
     except Exception as e:
-        return HTMLResponse(f"<h3>❌ Error uploading file: {e}</h3>")
-
+        return HTMLResponse(f"<h3>❌ Error uploading files: {e}</h3>")
     finally:
         cursor.close()
         conn.close()
-
-        # 🧹 Optional: clean up temp file
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
 
 @app.get("/api/patient_by_phone")
 async def get_patient_by_phone(phone: int):
