@@ -18,24 +18,20 @@
             margin-top: 1rem;
         }
         .file-entry {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             background-color: #3b5998;
-            padding: 0.5rem 1rem;
+            padding: 1rem;
             border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .file-entry img,
+        .file-entry iframe {
+            display: block;
+            max-width: 100%;
+            margin-top: 0.5rem;
+            border-radius: 0.5rem;
         }
         .file-entry a {
             color: #f1c40f;
-            text-decoration: underline;
-        }
-        .file-preview img {
-            max-height: 150px;
-        }
-        .file-preview iframe {
-            width: 100%;
-            height: 300px;
         }
     </style>
 </head>
@@ -57,7 +53,7 @@
 
     <!-- ⬆️ Upload Section -->
     <form id="upload-form" action="/upload_case_file" method="post" enctype="multipart/form-data">
-        <h5>Upload New File:</h5>
+        <h5>Upload New File(s):</h5>
         <input type="hidden" name="phone" id="upload_phone">
         <input type="file" name="files" class="form-control" multiple required>
         <button type="submit" class="btn btn-primary">Upload</button>
@@ -86,17 +82,19 @@
 
             let previewHTML = '';
             if (file.filename.endsWith('.jpg') || file.filename.endsWith('.jpeg') || file.filename.endsWith('.png')) {
-                previewHTML = `<img src="${file.url}" alt="${file.filename}" class="img-fluid" style="max-height:150px;" />`;
+                previewHTML = `<img src="${file.url}" alt="${file.filename}" style="max-height:200px;" />`;
             } else if (file.filename.endsWith('.pdf')) {
-                previewHTML = `<iframe src="${file.url}" class="file-preview"></iframe>`;
+                previewHTML = `<iframe src="${file.url}" width="100%" height="300px" style="border:none;"></iframe>`;
             } else {
                 previewHTML = `<a href="${file.url}" target="_blank">${file.filename}</a>`;
             }
 
             div.innerHTML = `
-                <div class="file-preview">${previewHTML}</div>
-                <button class="btn btn-sm btn-danger ms-2" onclick="deleteFile('${file.filename}')">Delete</button>
+                <strong>${file.filename}</strong>
+                <div class="mt-2">${previewHTML}</div>
+                <button class="btn btn-sm btn-danger mt-2" onclick="deleteFile('${file.filename}')">Delete</button>
             `;
+
             container.appendChild(div);
         });
     }
@@ -105,9 +103,7 @@
         const phone = document.getElementById("phone").value;
         if (!confirm(`Delete file: ${filename}?`)) return;
 
-        const res = await fetch(`/delete_casefile?filename=${filename}&phone=${phone}`, {
-            method: "DELETE"
-        });
+        const res = await fetch(`/delete_casefile?filename=${filename}&phone=${phone}`, { method: "DELETE" });
         if (res.ok) {
             alert("File deleted successfully.");
             fetchFiles();
