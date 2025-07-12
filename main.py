@@ -102,23 +102,31 @@ async def view_casefile(case_id: int, filename: str):
     conn = auth_snflk()
     cursor = conn.cursor()
     try:
-        # Download file into Snowflake internal temp table
+        os.makedirs("tmp_case_file", exist_ok=True)
+
+        # Use auto_compress=true to decompress .gz files
         cursor.execute(f"""
             GET @CLINIC_A.PUBLIC.CASE_FILES_STAGE/case_{case_id}/{filename}
-            file://tmp_case_file auto_compress=false;
+            file://tmp_case_file auto_compress=true;
         """)
+
         local_path = f"tmp_case_file/{filename}"
+        if filename.endswith(".gz"):
+            local_path = local_path[:-3]
+
         if not os.path.exists(local_path):
             raise HTTPException(status_code=404, detail="File not found")
 
-        ext = filename.split(".")[-1].lower()
-        media_type = "image/jpeg"
-        if ext == "png":
+        ext = local_path.split(".")[-1].lower()
+        media_type = "application/octet-stream"
+        if ext in ["jpg", "jpeg"]:
+            media_type = "image/jpeg"
+        elif ext == "png":
             media_type = "image/png"
         elif ext == "pdf":
             media_type = "application/pdf"
 
-        return FileResponse(local_path, media_type=media_type, filename=filename)
+        return FileResponse(local_path, media_type=media_type, filename=os.path.basename(local_path))
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
