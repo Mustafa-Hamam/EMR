@@ -137,6 +137,10 @@
             alert("Failed to delete file.");
         }
     }
+    document.getElementById("upload-form").addEventListener("submit", function(e) {
+    const phoneInput = document.getElementById("phone").value;
+    document.getElementById("upload_phone").value = phoneInput;
+});
 </script>
 </body>
 </html>
