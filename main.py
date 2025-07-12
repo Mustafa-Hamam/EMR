@@ -439,7 +439,11 @@ async def upload_case_file(
             put_command = f"PUT file://{temp_path} @CLINIC_A.PUBLIC.CASE_FILES_STAGE auto_compress=true"
             cursor.execute(put_command)
             uploaded.append(safe_filename)
-
+            cursor.execute("""
+                UPDATE CLINIC_A.PUBLIC.CASES
+                SET CASE_FILES = %s
+                WHERE CASE_ID = %s
+            """, (",".join(uploaded), case_id))
             # Clean up
             if os.path.exists(temp_path):
                 os.remove(temp_path)
