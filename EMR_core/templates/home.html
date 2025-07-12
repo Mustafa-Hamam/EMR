@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add New Patient, Doctor, Receptionist, or HR</title>
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    />
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <title>Smart EMR Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         body {
             background-color: #38485f;
@@ -26,29 +21,32 @@
             font-size: 2.5rem;
             font-weight: bold;
             color: #f1c40f;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        .welcome-header i {
-            margin-right: 0.5rem;
-            color: #f1c40f;
-            vertical-align: middle;
-        }
-
-        h1, p {
-            color: white;
+        .subtitle {
+            color: #ecf0f1;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
         }
 
         .button-container {
-            margin-top: 1rem;
+            margin: 0.5rem 0;
         }
 
         .btn-custom {
-            font-size: 1.5rem;
-            padding: 1.25rem 2.5rem;
+            font-size: 1.3rem;
+            padding: 1rem 2rem;
             border: none;
             border-radius: 0.5rem;
             width: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-custom i {
+            margin-right: 0.75rem;
         }
 
         .btn-addpatient { background-color: #6f42c1; color: white; }
@@ -56,43 +54,58 @@
         .btn-addreceptionist { background-color: #e67e22; color: white; }
         .btn-addhr { background-color: #3498db; color: white; }
         .btn-addvisit { background-color: #12f373; color: white; }
-        .btn-case { background-color: #4936d8; color: white; }        
+        .btn-case { background-color: #4936d8; color: white; }
         .btn-book { background-color: #ff69b4; color: white; }
         .btn-casefile { background-color: #9669ff; color: white; }
     </style>
 </head>
 <body>
+
     <div class="welcome-header">
-        <i class="fas fa-stethoscope"></i> Welcome to Smart EMR Sys
+        <i class="fas fa-hospital-user"></i> Smart EMR Dashboard
     </div>
-
-    <h1>Add New Patient, Doctor, Receptionist, HR, Or Visit</h1>
-    <p>Click below to add a new record</p>
+    <div class="subtitle">Manage Patients, Doctors, Appointments, and More</div>
 
     <div class="button-container">
-        <a href="/newpatient" class="btn btn-custom btn-addpatient">Add New Patient</a>
+        <a href="/newpatient" class="btn btn-custom btn-addpatient">
+            <i class="fas fa-user-plus"></i> Add New Patient
+        </a>
     </div>
     <div class="button-container">
-        <a href="/newdoctor" class="btn btn-custom btn-adddoctor">Add New Doctor</a>
+        <a href="/newdoctor" class="btn btn-custom btn-adddoctor">
+            <i class="fas fa-user-md"></i> Add New Doctor
+        </a>
     </div>
     <div class="button-container">
-        <a href="/newreceptionist" class="btn btn-custom btn-addreceptionist">Add New Receptionist</a>
+        <a href="/newreceptionist" class="btn btn-custom btn-addreceptionist">
+            <i class="fas fa-concierge-bell"></i> Add New Receptionist
+        </a>
     </div>
     <div class="button-container">
-        <a href="/newhr" class="btn btn-custom btn-addhr">Add New HR</a>
+        <a href="/newhr" class="btn btn-custom btn-addhr">
+            <i class="fas fa-briefcase"></i> Add New HR
+        </a>
     </div>
     <div class="button-container">
-        <a href="/newvisit" class="btn btn-custom btn-addvisit">Record Visit</a>
+        <a href="/newvisit" class="btn btn-custom btn-addvisit">
+            <i class="fas fa-notes-medical"></i> Record Visit
+        </a>
     </div>
     <div class="button-container">
-        <a href="/newbooking" class="btn btn-custom btn-book">Book Appointment</a>
+        <a href="/newbooking" class="btn btn-custom btn-book">
+            <i class="fas fa-calendar-plus"></i> Book Appointment
+        </a>
     </div>
-        <div class="button-container">
-        <a href="/newcase" class="btn btn-custom btn-case">Add New Case</a>
+    <div class="button-container">
+        <a href="/newcase" class="btn btn-custom btn-case">
+            <i class="fas fa-folder-plus"></i> Add New Case
+        </a>
     </div>
-        </div>
-        <div class="button-container">
-        <a href="/upload_case_file" class="btn btn-custom btn-casefile">Manage Case Files</a>
+    <div class="button-container">
+        <a href="/upload_case_file" class="btn btn-custom btn-casefile">
+            <i class="fas fa-file-medical"></i> Manage Case Files
+        </a>
     </div>
+
 </body>
 </html>
