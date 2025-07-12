@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import FastAPI
-from fastapi import Request, Form,HTTPException
+from fastapi import UploadFile, File, Form, Request,HTTPException, UploadFile
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 import os
