@@ -366,7 +366,7 @@ async def upload_case_file(
                 f.write(file_bytes)
 
             put_command = f"""
-                PUT file://{temp_path} @CLINIC_A.PUBLIC.CASE_FILES_STAGE/case_{case_id}/ auto_compress=true;
+                PUT file://{temp_path} @CASE_FILES_STAGE/case_{case_id}/ auto_compress=true;
             """
             cursor.execute(put_command)
             uploaded.append(safe_filename)
